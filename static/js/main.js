@@ -9,7 +9,6 @@ document.querySelectorAll('button, a').forEach(el => {
     });
 });
 
-
 // --- Background Music Control ---
 const bgMusic = document.getElementById('bg-music');
 const musicControl = document.getElementById('music-control');
@@ -35,7 +34,6 @@ if (musicControl) {
     });
 }
 
-
 // --- Raining Poop Effect ---
 function createPoop() {
     const rainContainer = document.getElementById('rain-container');
@@ -52,7 +50,6 @@ function createPoop() {
     setTimeout(() => poop.remove(), 6000);
 }
 setInterval(createPoop, 200);
-
 
 // --- Web3 Wallet Connection Logic ---
 const connectButton = document.getElementById('connect-wallet');
@@ -111,7 +108,6 @@ async function connectWallet() {
 if (connectButton) {
     connectButton.addEventListener('click', connectWallet);
 }
-
 
 // --- Mobile Menu Toggle ---
 (function() {
