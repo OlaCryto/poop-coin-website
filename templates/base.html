@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- This is the most important tag for responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="$POOP: The ultimate shitcoin on AVAX. Flush your FUD and join the dump!">
     <meta name="keywords" content="POOP, AVAX, meme coin, shitcoin, blockchain">
@@ -21,11 +20,10 @@
     <!-- Main navigation bar -->
     <nav class="bg-black bg-opacity-50 text-white p-4 sticky top-0 z-20">
         <div class="container mx-auto flex items-center justify-between">
-            <!-- Diagnostic Change: Added "v2" to the logo text -->
-            <a href="{{ url_for('home') }}" class="text-3xl">💩 $POOP v2</a>
+            <a href="{{ url_for('home') }}" class="text-3xl">💩 $POOP</a>
             
             <!-- Desktop Menu (hidden on screens smaller than md) -->
-            <div class="hidden md:flex items-center space-x-4 text-lg">
+            <div class="hidden md:flex items-center space-x-2 text-lg">
                 <a href="{{ url_for('home') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition-colors">Home</a>
                 <a href="{{ url_for('about') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition-colors">About</a>
                 <a href="{{ url_for('tokenomics') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition-colors">Tokenomics</a>
@@ -37,25 +35,31 @@
             </div>
 
             <!-- Mobile Menu Button (only visible on screens smaller than md) -->
-            <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                    </svg>
-                </button>
-            </div>
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <span class="sr-only">Open main menu</span>
+                <!-- Icon when menu is closed -->
+                <svg id="icon-open" class="h-6 w-6 block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <!-- Icon when menu is open -->
+                <svg id="icon-close" class="h-6 w-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
 
-        <!-- Mobile Menu (hidden by default, toggled with JS) -->
-        <div id="mobile-menu" class="hidden md:hidden mt-4">
-            <a href="{{ url_for('home') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">Home</a>
-            <a href="{{ url_for('about') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">About</a>
-            <a href="{{ url_for('tokenomics') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">Tokenomics</a>
-            <a href="{{ url_for('how_to_buy') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">How to Buy</a>
-            <a href="{{ url_for('launch') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">Launch</a>
-            <a href="{{ url_for('community') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">Community</a>
-            <a href="{{ url_for('whitelist') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">Whitelist</a>
-            <a href="{{ url_for('memes') }}" class="block py-2 px-4 text-lg hover:bg-yellow-500 hover:text-black">Meme Gallery</a>
+        <!-- Mobile Menu Panel (hidden by default, toggled with JS) -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{{ url_for('home') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">Home</a>
+                <a href="{{ url_for('about') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">About</a>
+                <a href="{{ url_for('tokenomics') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">Tokenomics</a>
+                <a href="{{ url_for('how_to_buy') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">How to Buy</a>
+                <a href="{{ url_for('launch') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">Launch</a>
+                <a href="{{ url_for('community') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">Community</a>
+                <a href="{{ url_for('whitelist') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">Whitelist</a>
+                <a href="{{ url_for('memes') }}" class="block py-2 px-3 rounded-md text-base hover:bg-yellow-500 hover:text-black">Meme Gallery</a>
+            </div>
         </div>
     </nav>
     
@@ -68,9 +72,15 @@
     <script>
         // Mobile menu toggle script
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('mobile-menu-button').addEventListener('click', function() {
-                var mobileMenu = document.getElementById('mobile-menu');
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const iconOpen = document.getElementById('icon-open');
+            const iconClose = document.getElementById('icon-close');
+
+            menuButton.addEventListener('click', function() {
                 mobileMenu.classList.toggle('hidden');
+                iconOpen.classList.toggle('hidden');
+                iconClose.classList.toggle('hidden');
             });
         });
     </script>
