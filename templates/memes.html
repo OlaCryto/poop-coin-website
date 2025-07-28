@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Meme Gallery - $POOP{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">The $POOP Meme Gallery</h1>
+    <p class="text-2xl mt-4">The community's finest, freshest dumps. Vote for your favorite!</p>
+
+    <!-- Meme Upload Form -->
+    <div class="my-10 p-6 bg-black bg-opacity-30 rounded-lg max-w-lg mx-auto border border-yellow-500">
+        <h2 class="text-3xl mb-4">Upload Your Masterpiece!</h2>
+        <!-- The form submits to the 'memes' endpoint as a multipart form for file upload -->
+        <form action="{{ url_for('memes') }}" method="post" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label for="meme_file" class="block text-left mb-2 text-xl">Choose a file (png, jpg, gif):</label>
+                <input type="file" name="file" id="meme_file" class="w-full text-black bg-gray-200 rounded p-2" required>
+            </div>
+            <button type="submit" class="bg-yellow-500 text-black px-6 py-3 rounded-full text-xl hover:scale-105">Upload Meme 🖼️</button>
+        </form>
+        <!-- This block displays status messages (e.g., success or error) from the Flask backend -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mt-4">
+                {% for category, message in messages %}
+                    <p class="text-lg p-2 rounded {{ 'bg-green-500 text-black' if category == 'success' else 'bg-red-500 text-white' }}">{{ message }}</p>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Meme Grid -->
+    <!-- The grid displays memes sorted by votes in descending order -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+        {% for meme in memes|sort(attribute='votes', reverse=true) %}
+        <div class="bg-black bg-opacity-50 p-4 rounded-lg flex flex-col items-center justify-between border border-yellow-700">
+            <!-- Meme image with a placeholder fallback -->
+            <img src="{{ url_for('static', filename='memes/' + meme.filename) }}" alt="A POOP meme" 
+                 class="w-full h-auto rounded-md mb-4 object-cover"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x400/4A2C0B/FFD700?text=Meme+Failed+to+Load';">
+            <div class="flex items-center space-x-4">
+                <!-- The data-id attribute holds the meme's unique ID for the voting API call -->
+                <button class="vote-btn bg-yellow-500 text-black px-4 py-2 rounded-full" data-id="{{ meme.id }}">Vote 👍</button>
+                <span id="votes-{{ meme.id }}" class="text-2xl font-bold">{{ meme.votes }}</span>
+            </div>
+        </div>
+        {% else %}
+        <!-- This message is shown if no memes have been uploaded yet -->
+        <p class="text-xl col-span-full">The gallery is empty. Be the first to upload a meme!</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Add a click event listener to every vote button
+    document.querySelectorAll('.vote-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            const memeId = e.target.dataset.id;
+            const votesSpan = document.getElementById(`votes-${memeId}`);
+            
+            try {
+                // Send a POST request to the voting API endpoint
+                const response = await fetch(`/api/vote/${memeId}`, { method: 'POST' });
+                const data = await response.json();
+
+                if (response.ok) {
+                    // If successful, update the vote count on the page
+                    votesSpan.textContent = data.votes;
+                    // Optional: Disable the button after voting to prevent spam
+                    e.target.disabled = true;
+                    e.target.textContent = 'Voted!';
+                    e.target.classList.remove('bg-yellow-500');
+                    e.target.classList.add('bg-gray-500');
+                } else {
+                    // Alert the user if something went wrong
+                    alert(data.error || 'Failed to vote.');
+                }
+            } catch (error) {
+                console.error('Error voting:', error);
+                alert('An error occurred while voting.');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

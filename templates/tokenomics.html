@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Tokenomics - $POOP{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">Tokenomics</h1>
+    
+    <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mt-12">
+        
+        <!-- Textual Information -->
+        <div class="text-left space-y-4 text-2xl md:text-3xl">
+            <p><span class="font-bold">Total Supply:</span> 1,000,000,000 $POOP</p>
+            <p><span class="font-bold">Transaction Tax:</span> 0% Buy / 0% Sell</p>
+            <p><span class="font-bold">Liquidity:</span> Locked & Burned Forever</p>
+            <p><span class="font-bold">Ownership:</span> Renounced at Launch</p>
+            <p><span class="font-bold">Distribution:</span> 100% Fair Launch</p>
+        </div>
+
+        <!-- Chart -->
+        <div class="w-full max-w-sm md:max-w-md">
+            <canvas id="tokenChart"></canvas>
+        </div>
+
+    </div>
+</section>
+
+<div class="py-10 text-center text-lg text-yellow-200 opacity-75">
+    © 2025 $POOP on AVAX. All rights reserved... or flushed.
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Include Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('tokenChart').getContext('2d');
+        
+        // Custom font settings for Chart.js to match the site's theme
+        Chart.defaults.font.family = "'Bangers', cursive";
+        Chart.defaults.font.size = 16;
+        Chart.defaults.color = '#FFD700';
+
+        const tokenChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Fair Launch Liquidity', 'Team Tokens', 'Marketing', 'Presale'],
+                datasets: [{
+                    label: '$POOP Distribution',
+                    // Data reflects the "100% Fair Launch" principle
+                    data: [100, 0, 0, 0], 
+                    backgroundColor: [
+                        '#FFD700', // Gold
+                        '#8B4513', // Brown
+                        '#A0522D', // Sienna
+                        '#D2691E'  // Chocolate
+                    ],
+                    borderColor: '#4A2C0B',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            padding: 20 // Add some space around legend items
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
