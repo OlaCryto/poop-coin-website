@@ -1,4 +1,8 @@
+# ...existing code...
+
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
+import requests
+import os
 import os
 import json
 import uuid
@@ -8,12 +12,46 @@ from werkzeug.utils import secure_filename
 # Initialize the Flask application
 app = Flask(__name__)
 
-# --- Configuration ---
-# A secret key is needed for flashing messages and other session-related security
+# --- New Page ---
+@app.route('/live-chart')
+def live_chart():
+    return render_template('live_chart.html')
+
 app.config['SECRET_KEY'] = os.urandom(24)
-# Folder where uploaded meme images will be stored
 app.config['UPLOAD_FOLDER'] = 'static/memes'
-# Allowed file extensions for uploads
+
+# Helper function to fetch holders data
+def get_holders_data():
+    api_url = "https://api.starsarena.com/shares/holders"
+    params = {
+        "userId": "dca14b91-a7c0-463a-bfad-fb69978f3c3d",
+        "page": 1,
+        "pageSize": 20
+    }
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiZmYyODczZmItMzhiYi00ZjQxLThhYzgtOGI3MWIyNjIzYjAwIiwidHdpdHRlcklkIjoiMTM5NjQzMTAyNDg4NDc5NzQ0NCIsInR3aXR0ZXJIYW5kbGUiOiJOZXRXaGl6Q3J5cHRvIiwidHdpdHRlck5hbWUiOiJOZXRfV2hpel82MTYiLCJ0d2l0dGVyUGljdHVyZSI6Imh0dHBzOi8vc3RhdGljLnN0YXJzYXJlbmEuY29tL3VwbG9hZHMvMTNhYzU0N2MtODAzYi01MDcyLWRmMDUtMWZlNzdlZDU0NTc4MTc1MjAyOTIzNDMwMi5wbmciLCJhZGRyZXNzIjoiMHhiY2I1NzdhNTczNGVkYjc2NzAwMDZkYTI5MWZiM2NiNDQ0NzFhNWZiIn0sImlhdCI6MTc1MjE5MTAzNCwiZXhwIjoxNzYwODMxMDM0fQ.S8aVPEfdFl6hja-ja_f2kUyLpMk9aDkpRMgNmKz3n5XkFwACMkUC8gseady1dX1nIiUfu04G1AquzqzBTKeP1TMbsiUFjO2_MNdCCF2_ZAQ9iSTylqep82w582qe8OWcKCGFdJoPGS6ThC10d580oXFyQoklKufJLut8jGUudfgPN9RkDq75-qKW8aVI589ph3eaWyhguQx0wFaeG2kTOQo2VyJPtahmZChJtoE2ad5k_o6z0XIDLadEGq8xLOgqkO5fZYI8eucUZckj1S6MdTwpLnc5JodN2anDkxOKBQRhJOON_rvdPNxNOXlvSgpPgLGHSmHsXjFKH7XqwwRmZcurT5UFg6SX8q9cWMAR75FMMH-Rp0J7R9cSKJl6CYPzOymc0N7XlBf9xcWt2SSBghj7rXnwowdUqkS5bTQb_K8et1R17FomdGu3GgJY0Bcz47jzv1ZV_DU4YrjiPd7UF5rp0qfnY4sSxJkvFvKgEJlxoutRB0mE-mywMHdL1c5K1BZkNP_sDdOi_QuIRDUq3FRgny6FcRsqyfDEUE3uMVEtSW92QNfOwr2u_4V2u9v9l8NNNAtumRHvXvtF1-rBvRLu3E-3Bw2b_l0bi-xgq5sUDHvavRNHXTSaxlPki8Ps04P6K_oyUTGuuy69Av9gLhp9i1k1DbrhWX8mJzTrC4k"
+    }
+    try:
+        response = requests.get(api_url, params=params, headers=headers)
+        response.raise_for_status()
+        holders_data = response.json().get('holders', [])
+    except Exception as e:
+        holders_data = []
+    return holders_data
+
+# --- Ticket Holders Route ---
+@app.route('/holders')
+def holders():
+    holders_data = get_holders_data()
+    return render_template('holders.html', holders=holders_data)
+
+# --- API endpoint for holders (AJAX polling) ---
+@app.route('/api/holders')
+def api_holders():
+    holders_data = get_holders_data()
+    return jsonify({'holders': holders_data})
+
+# --- Ticket Holders Route ---
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 # Create the upload folder if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -62,6 +100,7 @@ def inject_global_vars():
     """Injects global variables into the template context."""
     return dict(AVAX_LOGO=AVAX_LOGO, ARENA_LOGO=ARENA_LOGO)
 
+
 # --- Standard Page Routes ---
 @app.route('/')
 def home():
@@ -78,6 +117,10 @@ def tokenomics():
     """Renders the tokenomics page."""
     return render_template('tokenomics.html')
 
+@app.route('/history')
+def history():
+    return render_template('history.html')
+
 @app.route('/how-to-buy')
 def how_to_buy():
     """Renders the 'How to Buy' page."""
@@ -92,6 +135,11 @@ def launch():
 def community():
     """Renders the community page."""
     return render_template('community.html')
+
+
+@app.route('/leaderboard')
+def leaderboard():
+    return render_template('leaderboard.html')
 
 
 # --- Functional Routes (Meme Gallery & Whitelist) ---
@@ -181,7 +229,111 @@ def vote(meme_id):
     return jsonify({'votes': updated_meme['votes']})
 
 
+
+
+# --- API endpoint for homepage notification polling ---
+# Store previous holders state in memory
+import time
+from flask import g
+
+
+# --- Transaction History and Leaderboard ---
+previous_holders_state = {}
+transaction_history = []  # List of {name, action, amount, avatar, timestamp}
+
+def update_transaction_history(changes):
+    import datetime
+    now = datetime.datetime.utcnow().isoformat()
+    for change in changes:
+        transaction_history.append({
+            'name': change['name'],
+            'action': change['action'],
+            'amount': change['amount'],
+            'avatar': change.get('avatar'),
+            'timestamp': now
+        })
+    # Keep only last 100 events
+    if len(transaction_history) > 100:
+        transaction_history[:] = transaction_history[-100:]
+
+def get_leaderboard():
+    holders = previous_holders_state.get('holders', [])
+    leaderboard = sorted([
+        {
+            'name': h['traderUser']['twitterName'],
+            'handle': h['traderUser']['twitterHandle'],
+            'avatar': h['traderUser']['twitterPicture'],
+            'amount': h['amount']
+        } for h in holders
+    ], key=lambda x: x['amount'], reverse=True)
+    return leaderboard[:10]
+
+
+def detect_changes(prev, current):
+    changes = []
+    prev_map = {h['traderUser']['twitterHandle']: h['amount'] for h in prev}
+    curr_map = {h['traderUser']['twitterHandle']: h['amount'] for h in current}
+    # Detect buys and sells
+    for handle, amount in curr_map.items():
+        prev_amount = prev_map.get(handle, 0)
+        if amount > prev_amount:
+            changes.append({
+                'name': next(h['traderUser']['twitterName'] for h in current if h['traderUser']['twitterHandle'] == handle),
+                'action': 'buy',
+                'amount': amount - prev_amount
+            })
+        elif amount < prev_amount:
+            changes.append({
+                'name': next(h['traderUser']['twitterName'] for h in current if h['traderUser']['twitterHandle'] == handle),
+                'action': 'sell',
+                'amount': prev_amount - amount
+            })
+    # Detect new buyers
+    for handle, amount in curr_map.items():
+        if handle not in prev_map:
+            changes.append({
+                'name': next(h['traderUser']['twitterName'] for h in current if h['traderUser']['twitterHandle'] == handle),
+                'action': 'buy',
+                'amount': amount
+            })
+    # Detect sellers who left (amount dropped to 0)
+    for handle, amount in prev_map.items():
+        if handle not in curr_map:
+            changes.append({
+                'name': next(h['traderUser']['twitterName'] for h in prev if h['traderUser']['twitterHandle'] == handle),
+                'action': 'sell',
+                'amount': amount
+            })
+    return changes
+
+
+@app.route('/api/holders_count')
+def api_holders_count():
+    global previous_holders_state
+    holders_data = get_holders_data()
+    prev = previous_holders_state.get('holders', [])
+    changes = detect_changes(prev, holders_data)
+    # Add avatar to changes
+    for change in changes:
+        for h in holders_data:
+            if h['traderUser']['twitterName'] == change['name']:
+                change['avatar'] = h['traderUser']['twitterPicture']
+                break
+    update_transaction_history(changes)
+    previous_holders_state['holders'] = holders_data
+    return jsonify({'count': len(holders_data), 'changes': changes})
+
+# --- API endpoint for transaction history ---
+@app.route('/api/history')
+def api_history():
+    return jsonify({'history': transaction_history[-50:]})
+
+# --- API endpoint for leaderboard ---
+@app.route('/api/leaderboard')
+def api_leaderboard():
+    return jsonify({'leaderboard': get_leaderboard()})
+
 # --- Main execution block ---
 if __name__ == '__main__':
     # Debug mode is turned off for production
-    app.run(debug=False)
+    app.run(debug=True)
