@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Transaction History{% endblock %}
+{% block content %}
+<section class="py-10 container mx-auto">
+    <h1 class="text-4xl mb-6">Recent Buy/Sell Events</h1>
+    <ul id="history-list" class="space-y-4"></ul>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+function renderHistory(history) {
+    const list = document.getElementById('history-list');
+    if (!history.length) {
+        list.innerHTML = '<li>No recent events.</li>';
+        return;
+    }
+    list.innerHTML = history.map(event => `
+        <li class="p-4 bg-yellow-100 rounded shadow flex items-center gap-4">
+            <img src="${event.avatar || ''}" alt="${event.name}" class="h-12 w-12 rounded-full border-2 border-yellow-500">
+            <div>
+                <strong class="text-xl">${event.name}</strong>
+                <span class="ml-2">${event.action === 'buy' ? 'bought' : 'sold'} <span class="font-bold">${event.amount}</span> ticket${event.amount > 1 ? 's' : ''}</span>
+                <div class="text-gray-700 text-sm mt-1">${new Date(event.timestamp).toLocaleString()}</div>
+            </div>
+        </li>
+    `).join('');
+}
+function fetchHistory() {
+    fetch('/api/history')
+        .then(res => res.json())
+        .then(data => renderHistory(data.history || []));
+}
+setInterval(fetchHistory, 3000);
+document.addEventListener('DOMContentLoaded', fetchHistory);
+</script>
+{% endblock %}
