@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard{% endblock %}
+{% block content %}
+<section class="py-10 container mx-auto">
+    <h1 class="text-4xl mb-6">Top Ticket Holders</h1>
+    <ul id="leaderboard-list" class="space-y-4"></ul>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+function renderLeaderboard(leaderboard) {
+    const list = document.getElementById('leaderboard-list');
+    if (!leaderboard.length) {
+        list.innerHTML = '<li>No holders found.</li>';
+        return;
+    }
+    list.innerHTML = leaderboard.map(holder => `
+        <li class="p-4 bg-yellow-100 rounded shadow flex items-center gap-4">
+            <img src="${holder.avatar || ''}" alt="${holder.name}" class="h-12 w-12 rounded-full border-2 border-yellow-500">
+            <div>
+                <strong class="text-xl">${holder.name}</strong>
+                <div class="text-gray-700">@${holder.handle}</div>
+                <div class="text-black mt-1">Tickets: <span class="font-bold">${holder.amount}</span></div>
+            </div>
+        </li>
+    `).join('');
+}
+function fetchLeaderboard() {
+    fetch('/api/leaderboard')
+        .then(res => res.json())
+        .then(data => renderLeaderboard(data.leaderboard || []));
+}
+setInterval(fetchLeaderboard, 5000);
+document.addEventListener('DOMContentLoaded', fetchLeaderboard);
+</script>
+{% endblock %}
