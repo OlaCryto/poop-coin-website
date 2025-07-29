@@ -16,58 +16,89 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" defer></script>
 </head>
-<body class="relative">
+<body class="relative" id="body-root">
 
     <audio id="bg-music" loop src="https://www.soundjay.com/toilet-flush-4.mp3" preload="auto"></audio>
     
-    <!-- Navigation bar -->
+    <!-- Navigation bar before hamburger menu -->
     <nav class="bg-black bg-opacity-50 text-white p-4 sticky top-0 z-20">
-        <div class="container mx-auto flex items-center justify-between">
+        <div class="container mx-auto flex flex-wrap items-center justify-between">
             <!-- Logo -->
-            <a href="{{ url_for('home') }}" class="text-3xl font-bold">💩 $POOP</a>
-
-            <!-- Desktop Nav -->
-            <div class="hidden md:flex items-center space-x-2 text-lg">
-                <a href="{{ url_for('home') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">Home</a>
-                <a href="{{ url_for('about') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">About</a>
-                <a href="{{ url_for('tokenomics') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">Tokenomics</a>
-                <a href="{{ url_for('how_to_buy') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">How to Buy</a>
-                <a href="{{ url_for('launch') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">Launch</a>
-                <a href="{{ url_for('community') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">Community</a>
-                <a href="{{ url_for('whitelist') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">Whitelist</a>
-                <a href="{{ url_for('memes') }}" class="px-3 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition">Meme Gallery</a>
-                <button id="music-control" class="bg-yellow-500 text-black px-3 py-2 rounded-full hover:scale-105 transition">Mute Music 🔇</button>
+            <a href="{{ url_for('home') }}" class="text-3xl font-bold mb-2 sm:mb-0">💩 $POOP</a>
+            <!-- Navigation links and controls -->
+            <div class="flex items-center gap-4 relative">
+                <button id="menu-toggle" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition focus:outline-none">Menu</button>
+                <div id="menu-dropdown" class="hidden absolute top-12 right-0 w-56 bg-gray-900 border-2 border-white rounded-xl shadow-lg flex flex-col z-50">
+                    <a href="{{ url_for('about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black rounded-t-xl transition">About</a>
+                    <a href="{{ url_for('tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Tokenomics</a>
+                    <a href="{{ url_for('how_to_buy') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">How to Buy</a>
+                    <a href="{{ url_for('launch') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Launch</a>
+                    <a href="{{ url_for('community') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Community</a>
+                    <a href="{{ url_for('whitelist') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Whitelist</a>
+                    <a href="{{ url_for('memes') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Meme Gallery</a>
+                    <a href="{{ url_for('holders') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Ticket Holders</a>
+                    <a href="{{ url_for('history') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">History</a>
+                    <a href="{{ url_for('leaderboard') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Leaderboard</a>
+                    <a href="{{ url_for('live_chart') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black rounded-b-xl transition">Live Chart</a>
+                </div>
+                <button id="dark-mode-toggle" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition text-xs sm:text-base ml-2">🌙</button>
+                <button id="music-control" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition text-xs sm:text-base ml-2">🔇</button>
             </div>
-
-            <!-- Mobile Hamburger Button -->
-            <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden px-4 pt-3 pb-4 space-y-2 text-base">
-            <a href="{{ url_for('home') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">Home</a>
-            <a href="{{ url_for('about') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">About</a>
-            <a href="{{ url_for('tokenomics') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">Tokenomics</a>
-            <a href="{{ url_for('how_to_buy') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">How to Buy</a>
-            <a href="{{ url_for('launch') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">Launch</a>
-            <a href="{{ url_for('community') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">Community</a>
-            <a href="{{ url_for('whitelist') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">Whitelist</a>
-            <a href="{{ url_for('memes') }}" class="block px-3 py-2 rounded hover:bg-yellow-500 hover:text-black">Meme Gallery</a>
-            <button id="music-control-mobile" class="w-full bg-yellow-500 text-black py-2 rounded hover:scale-105">Mute Music 🔇</button>
         </div>
     </nav>
+    // ...existing code...
+    <script>
+    // Menu dropdown toggle logic
+    (function() {
+        var menuToggle = document.getElementById('menu-toggle');
+        var menuDropdown = document.getElementById('menu-dropdown');
+        if (menuToggle && menuDropdown) {
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                menuDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', function(e) {
+                if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+                    menuDropdown.classList.add('hidden');
+                }
+            });
+            menuDropdown.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    menuDropdown.classList.add('hidden');
+                });
+            });
+        }
+    })();
+    </script>
 
     <main class="fade-in">
         {% block content %}{% endblock %}
     </main>
 
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    // Dark mode toggle logic
+    const bodyRoot = document.getElementById('body-root');
+    const darkToggle = document.getElementById('dark-mode-toggle');
+    function setDarkMode(enabled) {
+        if (enabled) {
+            bodyRoot.classList.add('bg-gray-900', 'text-yellow-100');
+            darkToggle.textContent = '☀️ Light Mode';
+        } else {
+            bodyRoot.classList.remove('bg-gray-900', 'text-yellow-100');
+            darkToggle.textContent = '🌙 Dark Mode';
+        }
+        localStorage.setItem('darkMode', enabled ? '1' : '0');
+    }
+    darkToggle.addEventListener('click', () => {
+        setDarkMode(!bodyRoot.classList.contains('bg-gray-900'));
+    });
+    // On load, set mode from localStorage
+    if (localStorage.getItem('darkMode') === '1') {
+        setDarkMode(true);
+    }
+    </script>
 
     <!-- Mobile Menu Toggle Logic -->
     <script>
