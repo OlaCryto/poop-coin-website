@@ -34,7 +34,7 @@
                 </button>
                 <!-- Desktop menu -->
                 <div class="relative group hidden sm:block">
-                  <div id="desktop-menu-trigger" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold cursor-pointer" tabindex="0" aria-label="Open Menu" title="Menu">Menu</div>
+                  <div id="desktop-menu-trigger" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold cursor-pointer group-hover:bg-yellow-600" tabindex="0" aria-label="Open Menu" title="Menu">Menu</div>
                   <div id="menu-dropdown" class="absolute top-full right-0 w-56 rounded-xl shadow-lg overflow-hidden z-50 frosted-glass opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 ease-in-out flex flex-col">
                     <a href="{{ url_for('about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">About</a>
                     <a href="{{ url_for('tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Tokenomics</a>
@@ -154,7 +154,7 @@
     });
     // --- Mobile & Desktop Menu Logic ---
     (function () {
-        // Desktop menu: open on click for touch devices
+        // Desktop menu: hover for desktop, click for touch devices
         function isTouchDevice() {
             return (('ontouchstart' in window) || navigator.maxTouchPoints > 0);
         }
@@ -196,6 +196,7 @@
                     }
                 });
             }
+            // For desktop, hover logic is retained via CSS (group-hover)
         }
         function closeMobileMenuOnOutsideClick() {
             const mobileMenu = document.getElementById('mobile-menu');
