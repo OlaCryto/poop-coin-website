@@ -34,7 +34,7 @@
                 </button>
                 <!-- Desktop menu -->
                 <div class="relative group hidden sm:block">
-                  <div class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold cursor-pointer">Menu</div>
+                  <div id="desktop-menu-trigger" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold cursor-pointer" tabindex="0" aria-label="Open Menu" title="Menu">Menu</div>
                   <div id="menu-dropdown" class="absolute top-full right-0 w-56 rounded-xl shadow-lg overflow-hidden z-50 frosted-glass opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 ease-in-out flex flex-col">
                     <a href="{{ url_for('about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">About</a>
                     <a href="{{ url_for('tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Tokenomics</a>
@@ -152,8 +152,51 @@
             }
         });
     });
-    // --- Mobile Menu Logic ---
+    // --- Mobile & Desktop Menu Logic ---
     (function () {
+        // Desktop menu: open on click for touch devices
+        function isTouchDevice() {
+            return (('ontouchstart' in window) || navigator.maxTouchPoints > 0);
+        }
+        function initDesktopMenu() {
+            const trigger = document.getElementById('desktop-menu-trigger');
+            const dropdown = document.getElementById('menu-dropdown');
+            if (!trigger || !dropdown) return;
+            if (isTouchDevice()) {
+                // On touch, open/close on click
+                let open = false;
+                function showMenu() {
+                    dropdown.classList.remove('opacity-0', 'pointer-events-none');
+                    dropdown.classList.add('opacity-100', 'pointer-events-auto');
+                    open = true;
+                }
+                function hideMenu() {
+                    dropdown.classList.add('opacity-0', 'pointer-events-none');
+                    dropdown.classList.remove('opacity-100', 'pointer-events-auto');
+                    open = false;
+                }
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (open) {
+                        hideMenu();
+                    } else {
+                        showMenu();
+                    }
+                });
+                // Close on outside click
+                document.addEventListener('click', function(e) {
+                    if (open && !dropdown.contains(e.target) && e.target !== trigger) {
+                        hideMenu();
+                    }
+                });
+                // Accessibility: close on Escape
+                document.addEventListener('keydown', function(e) {
+                    if (open && (e.key === 'Escape')) {
+                        hideMenu();
+                    }
+                });
+            }
+        }
         function closeMobileMenuOnOutsideClick() {
             const mobileMenu = document.getElementById('mobile-menu');
             document.addEventListener('click', function(e) {
@@ -182,6 +225,7 @@
                 });
             }
             closeMobileMenuOnOutsideClick();
+            initDesktopMenu();
         }
         if (document.readyState !== 'loading') {
             initMobileMenu();
