@@ -178,16 +178,11 @@
     });
     // --- Mobile & Desktop Menu Logic ---
     (function () {
-        // Desktop menu: hover for desktop, click for touch devices
-        function isTouchDevice() {
-            return (('ontouchstart' in window) || navigator.maxTouchPoints > 0);
-        }
         function initDesktopMenu() {
             const trigger = document.getElementById('desktop-menu-trigger');
             const dropdown = document.getElementById('menu-dropdown');
             let isOpen = false;
             if (!trigger || !dropdown) return;
-            // Toggle menu on click for all devices
             trigger.addEventListener('click', function (e) {
                 e.stopPropagation();
                 isOpen = !isOpen;
@@ -199,7 +194,6 @@
                     dropdown.classList.remove('opacity-100', 'pointer-events-auto');
                 }
             });
-            // Close menu when clicking outside
             document.addEventListener('click', function (e) {
                 if (isOpen && !dropdown.contains(e.target) && e.target !== trigger) {
                     dropdown.classList.add('opacity-0', 'pointer-events-none');
@@ -207,7 +201,6 @@
                     isOpen = false;
                 }
             });
-            // Close on Escape
             document.addEventListener('keydown', function (e) {
                 if (isOpen && e.key === 'Escape') {
                     dropdown.classList.add('opacity-0', 'pointer-events-none');
@@ -224,6 +217,11 @@
                 if (!mobileMenu.classList.contains('hidden')) {
                     if (!mobileMenu.contains(e.target) && e.target !== menuButton) {
                         mobileMenu.classList.add('hidden');
+                        // Restore hamburger icon
+                        const icon = menuButton.querySelector('svg');
+                        if (icon) {
+                            icon.innerHTML = `<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>`;
+                        }
                     }
                 }
             });
@@ -240,16 +238,26 @@
                     mobileMenu.classList.toggle('hidden');
                     if (!mobileMenu.classList.contains('hidden')) {
                         icon.innerHTML = closeX;
+                        document.body.style.overflow = 'hidden'; // Prevent scroll
                     } else {
                         icon.innerHTML = hamburger;
+                        document.body.style.overflow = '';
                     }
                 });
-                // Accessibility: close menu on Escape
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
                         mobileMenu.classList.add('hidden');
                         icon.innerHTML = hamburger;
+                        document.body.style.overflow = '';
                     }
+                });
+                // Close menu on navigation
+                document.querySelectorAll('#mobile-menu a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        icon.innerHTML = hamburger;
+                        document.body.style.overflow = '';
+                    });
                 });
             }
             closeMobileMenuOnOutsideClick();
