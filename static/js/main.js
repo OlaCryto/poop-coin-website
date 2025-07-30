@@ -6,12 +6,18 @@ buttonClickSound.load();
 
 // Add a click event listener to ALL buttons and links.
 // This plays the sound effect on click.
-document.querySelectorAll('button, a').forEach(el => {
-    el.addEventListener('click', () => {
-        // Resetting currentTime allows the sound to be played again quickly.
+// --- Mute Logic ---
+let isMuted = localStorage.getItem('isMuted') === '1';
+
+function playButtonSound() {
+    if (!isMuted) {
         buttonClickSound.currentTime = 0;
         buttonClickSound.play().catch(e => console.error("Button sound failed to play:", e));
-    });
+    }
+}
+
+document.querySelectorAll('button, a').forEach(el => {
+    el.addEventListener('click', playButtonSound);
 });
 
 
@@ -42,6 +48,38 @@ if (musicControl) {
         }
     });
 }
+// --- Mute/Unmute Functions ---
+function muteAllSounds() {
+    isMuted = true;
+    localStorage.setItem('isMuted', '1');
+    if (bgMusic) bgMusic.pause();
+}
+
+function unmuteAllSounds() {
+    isMuted = false;
+    localStorage.setItem('isMuted', '0');
+    if (bgMusic) bgMusic.play().catch(() => {});
+}
+
+// Listen for mute button (from base.html)
+const muteButton = document.getElementById('mute-button');
+if (muteButton) {
+    muteButton.addEventListener('click', () => {
+        if (isMuted) {
+            unmuteAllSounds();
+        } else {
+            muteAllSounds();
+        }
+    });
+}
+
+// Prevent background music from playing if muted
+document.body.addEventListener('click', () => {
+    if (!musicHasStarted && bgMusic && !isMuted) {
+        bgMusic.play().catch(e => console.error("Background music failed to start:", e));
+        musicHasStarted = true;
+    }
+}, { once: true });
 
 
 // --- Raining Poop Effect ---

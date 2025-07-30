@@ -1,23 +1,48 @@
 import json
-from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
-import requests
 import os
-import json
 import uuid
 import threading
+import requests
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from pywebpush import webpush, WebPushException
 
+from authlib.integrations.flask_client import OAuth
+
 # Initialize the Flask application
 app = Flask(__name__)
-
-# ...existing code before alert system...
-# ...existing code...
 
 ## Removed live chart route and template reference
 
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['UPLOAD_FOLDER'] = 'static/memes'
+
+# --- X (Twitter) OAuth Configuration ---
+app.config['X_CLIENT_ID'] = 'dUp5ckxTOGprazZWazV2TGJPdUk6MTpjaQ'
+app.config['X_CLIENT_SECRET'] = 'g8a8CJAODhn5AclSAUHtYYgpTKsl6XU41Xrh4zVrGNKwIcwEWK'
+app.config['X_AUTHORIZE_URL'] = 'https://twitter.com/i/oauth2/authorize'
+app.config['X_TOKEN_URL'] = 'https://api.twitter.com/oauth2/token'
+app.config['X_API_BASE_URL'] = 'https://api.twitter.com/2/'
+app.config['X_REDIRECT_URI'] = 'https://www.poop-coin.xyz/callback'  # Updated to live domain
+app.config['TWITTER_BEARER_TOKEN'] = 'AAAAAAAAAAAAAAAAAAAAALMDygEAAAAALolqW%2B%2BqS1qSOs2CX4c0fxRXxJA%3DoVD4Zrrt34D1G6IkMXmAgJELeiT0euR7sc9CNymBJS4fKN56OR'
+app.config['TWITTER_ACCESS_TOKEN'] = '1396431024884797444-1Ew5SrVwmclblg2bWIXThWz0sa1AsA'
+app.config['TWITTER_ACCESS_TOKEN_SECRET'] = 'TBpkitvrRydKm36yylAGoMRu55ZclrU2d1AEhyhsG1z6s'
+app.config['TWITTER_API_KEY'] = 'srNy7lRwLWdY0FlHmAUJs9e3A'
+app.config['TWITTER_API_KEY_SECRET'] = '2HhJHnuHPLitIQIIqxDCftSp24cjrRgCtSrcnLtOTjVpb7vapq'
+
+oauth = OAuth(app)
+oauth.register(
+    name='x',
+    client_id=app.config['X_CLIENT_ID'],
+    client_secret=app.config['X_CLIENT_SECRET'],
+    access_token_url=app.config['X_TOKEN_URL'],
+    authorize_url=app.config['X_AUTHORIZE_URL'],
+    api_base_url=app.config['X_API_BASE_URL'],
+    client_kwargs={
+        'scope': 'tweet.read users.read offline.access',
+        'token_endpoint_auth_method': 'client_secret_post',
+    }
+)
 
 # Helper function to fetch holders data
 def get_holders_data():
@@ -92,12 +117,42 @@ def write_json_file(filepath, data):
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=4)
 
-# --- Context Processors ---
+## --- Context Processors ---
 # This makes variables available to all templates without passing them in each render_template call
 @app.context_processor
 def inject_global_vars():
     """Injects global variables into the template context."""
-    return dict(AVAX_LOGO=AVAX_LOGO, ARENA_LOGO=ARENA_LOGO)
+    user = session.get('user')
+    return dict(AVAX_LOGO=AVAX_LOGO, ARENA_LOGO=ARENA_LOGO, user=user)
+
+# --- X (Twitter) Login Route ---
+@app.route('/login')
+def login():
+    redirect_uri = app.config['X_REDIRECT_URI']
+    return oauth.x.authorize_redirect(redirect_uri)
+
+# --- X (Twitter) Callback Route ---
+@app.route('/callback')
+def callback():
+    token = oauth.x.authorize_access_token()
+    resp = oauth.x.get('users/me', token=token)
+    profile = resp.json().get('data', {})
+    # Store user info in session
+    session['user'] = {
+        'name': profile.get('name'),
+        'username': profile.get('username'),
+        'id': profile.get('id'),
+        'profile_image_url': profile.get('profile_image_url', ''),
+    }
+    flash('Logged in successfully!', 'success')
+    return redirect(url_for('home'))
+
+# --- Logout Route ---
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash('Logged out.', 'info')
+    return redirect(url_for('home'))
 
 
 @app.route('/')
