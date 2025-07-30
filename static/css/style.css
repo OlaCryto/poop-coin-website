@@ -119,3 +119,11 @@ button:hover, a.hover\:scale-105:hover {
 .icon-filter {
     filter: brightness(0) invert(1);
 }
+
+/* --- Frosted Glass Effect for Dropdown --- */
+.frosted-glass {
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* For Safari */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+}

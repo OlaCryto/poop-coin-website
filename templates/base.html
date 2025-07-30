@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- This is the most important tag for responsiveness -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="$POOP: The ultimate shitcoin on AVAX. Flush your FUD and join the dump!">
     <meta name="keywords" content="POOP, AVAX, meme coin, shitcoin, blockchain">
     <title>{% block title %}$POOP on AVAX{% endblock %}</title>
@@ -19,85 +19,176 @@
 <body class="relative" id="body-root">
 
     <audio id="bg-music" loop src="https://www.soundjay.com/toilet-flush-4.mp3" preload="auto"></audio>
+    <audio id="click-sound" src="{{ url_for('static', filename='sounds/fart.mp3') }}" preload="auto"></audio>
     
     <!-- Navigation bar before hamburger menu -->
     <nav class="bg-black bg-opacity-50 text-white p-4 sticky top-0 z-20">
         <div class="container mx-auto flex flex-wrap items-center justify-between">
             <!-- Logo -->
-            <a href="{{ url_for('home') }}" class="text-3xl font-bold mb-2 sm:mb-0">💩 $POOP</a>
+            <a href="{{ url_for('home') }}" class="text-3xl font-bold mb-2 sm:mb-0 plays-sound">💩 $POOP</a>
             <!-- Navigation links and controls -->
             <div class="flex items-center gap-4 relative">
-                <button id="menu-toggle" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition focus:outline-none">Menu</button>
-                <div id="menu-dropdown" class="hidden absolute top-12 right-0 w-56 bg-gray-900 border-2 border-white rounded-xl shadow-lg flex flex-col z-50">
-                    <a href="{{ url_for('about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black rounded-t-xl transition">About</a>
-                    <a href="{{ url_for('tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Tokenomics</a>
-                    <a href="{{ url_for('how_to_buy') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">How to Buy</a>
-                    <a href="{{ url_for('launch') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Launch</a>
-                    <a href="{{ url_for('community') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Community</a>
-                    <a href="{{ url_for('whitelist') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Whitelist</a>
-                    <a href="{{ url_for('memes') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Meme Gallery</a>
-                    <a href="{{ url_for('holders') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Ticket Holders</a>
-                    <a href="{{ url_for('history') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">History</a>
-                    <a href="{{ url_for('leaderboard') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black transition">Leaderboard</a>
-                    <a href="{{ url_for('live_chart') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500 hover:text-black rounded-b-xl transition">Live Chart</a>
+                <!-- Hamburger for mobile -->
+                <button id="mobile-menu-button" class="sm:hidden px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition text-base ml-2" aria-label="Open Menu" title="Menu">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <!-- Desktop menu -->
+                <div class="relative group hidden sm:block">
+                  <div class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold cursor-pointer">Menu</div>
+                  <div id="menu-dropdown" class="absolute top-full right-0 w-56 rounded-xl shadow-lg overflow-hidden z-50 frosted-glass opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 ease-in-out flex flex-col">
+                    <a href="{{ url_for('about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">About</a>
+                    <a href="{{ url_for('tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Tokenomics</a>
+                    <a href="{{ url_for('how_to_buy') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">How to Buy</a>
+                    <a href="{{ url_for('community') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Community</a>
+                    <a href="{{ url_for('whitelist') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Whitelist</a>
+                    <a href="{{ url_for('memes') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Meme Gallery</a>
+                    <a href="{{ url_for('holders') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Ticket Holders</a>
+                    <a href="{{ url_for('history') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">History</a>
+                    <a href="{{ url_for('leaderboard') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Leaderboard</a>
+                  </div>
                 </div>
-                <button id="dark-mode-toggle" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition text-xs sm:text-base ml-2">🌙</button>
-                <button id="music-control" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition text-xs sm:text-base ml-2">🔇</button>
+                <!-- Mobile menu -->
+                <div id="mobile-menu" class="absolute top-full right-0 w-56 rounded-xl shadow-lg overflow-hidden z-50 frosted-glass flex flex-col sm:hidden hidden">
+                  <a href="{{ url_for('about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">About</a>
+                  <a href="{{ url_for('tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Tokenomics</a>
+                  <a href="{{ url_for('how_to_buy') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">How to Buy</a>
+                  <a href="{{ url_for('community') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Community</a>
+                  <a href="{{ url_for('whitelist') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Whitelist</a>
+                  <a href="{{ url_for('memes') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Meme Gallery</a>
+                  <a href="{{ url_for('holders') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Ticket Holders</a>
+                  <a href="{{ url_for('history') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">History</a>
+                  <a href="{{ url_for('leaderboard') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 hover:bg-yellow-500/50 hover:text-black transition-colors duration-300 plays-sound">Leaderboard</a>
+                </div>
+                <button id="dark-mode-toggle" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition text-xs sm:text-base ml-2 plays-sound" aria-label="Toggle Dark Mode" title="Toggle Dark Mode">🌙</button>
+                <button id="mute-button" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 transition text-xs sm:text-base ml-2 unmuted plays-sound" aria-label="Mute/Unmute" title="Mute" tabindex="0">
+                  <span id="mute-icon">
+                    <!-- Unmuted SVG -->
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                  </span>
+                </button>
             </div>
         </div>
     </nav>
-    // ...existing code...
-    <script>
-    // Menu dropdown toggle logic
-    (function() {
-        var menuToggle = document.getElementById('menu-toggle');
-        var menuDropdown = document.getElementById('menu-dropdown');
-        if (menuToggle && menuDropdown) {
-            menuToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                menuDropdown.classList.toggle('hidden');
-            });
-            document.addEventListener('click', function(e) {
-                if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
-                    menuDropdown.classList.add('hidden');
-                }
-            });
-            menuDropdown.querySelectorAll('a').forEach(function(link) {
-                link.addEventListener('click', function() {
-                    menuDropdown.classList.add('hidden');
-                });
-            });
-        }
-    })();
-    </script>
 
     <main class="fade-in">
         {% block content %}{% endblock %}
     </main>
 
-
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-    // Dark mode toggle logic
+    // --- Dark Mode Logic ---
     const bodyRoot = document.getElementById('body-root');
     const darkToggle = document.getElementById('dark-mode-toggle');
+    
     function setDarkMode(enabled) {
         if (enabled) {
             bodyRoot.classList.add('bg-gray-900', 'text-yellow-100');
-            darkToggle.textContent = '☀️ Light Mode';
+            darkToggle.textContent = '☀️'; // Sun icon for light mode
         } else {
             bodyRoot.classList.remove('bg-gray-900', 'text-yellow-100');
-            darkToggle.textContent = '🌙 Dark Mode';
+            darkToggle.textContent = '🌙'; // Moon icon for dark mode
         }
         localStorage.setItem('darkMode', enabled ? '1' : '0');
     }
+
     darkToggle.addEventListener('click', () => {
         setDarkMode(!bodyRoot.classList.contains('bg-gray-900'));
     });
-    // On load, set mode from localStorage
+
+    // Set mode from localStorage on page load
     if (localStorage.getItem('darkMode') === '1') {
         setDarkMode(true);
     }
+
+    // --- Sound Logic with accessibility and SVG icons ---
+    let isMuted = false;
+    document.addEventListener("DOMContentLoaded", () => {
+        isMuted = false;
+        updateMuteButton();
+        const bgMusic = document.getElementById('bg-music');
+        if (bgMusic) {
+            bgMusic.play().catch(e => {});
+        }
+    });
+    function toggleMute() {
+        isMuted = !isMuted;
+        const bgMusic = document.getElementById('bg-music');
+        if (isMuted) {
+            if (bgMusic) bgMusic.pause();
+        } else {
+            if (bgMusic) bgMusic.play().catch(e => {});
+        }
+        updateMuteButton();
+    }
+    function updateMuteButton() {
+        const btn = document.getElementById("mute-button");
+        const icon = document.getElementById("mute-icon");
+        if (!btn || !icon) return;
+        btn.classList.toggle("muted", isMuted);
+        btn.classList.toggle("unmuted", !isMuted);
+        btn.setAttribute("aria-label", isMuted ? "Unmute" : "Mute");
+        btn.setAttribute("title", isMuted ? "Unmute" : "Mute");
+        if (isMuted) {
+          // Muted SVG
+          icon.innerHTML = `<svg class='w-6 h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='11 5 6 9 2 9 2 15 6 15 11 19 11 5'></polygon><line x1='23' y1='9' x2='17' y2='15'></line><line x1='17' y1='9' x2='23' y2='15'></line></svg>`;
+        } else {
+          // Unmuted SVG
+          icon.innerHTML = `<svg class='w-6 h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='11 5 6 9 2 9 2 15 6 15 11 19 11 5'></polygon></svg>`;
+        }
+    }
+    document.getElementById("mute-button").addEventListener("click", toggleMute);
+    document.getElementById("mute-button").addEventListener("keydown", function(e) {
+      if (e.key === "Enter" || e.key === " ") {
+        toggleMute();
+      }
+    });
+    // Optional: on internal link clicks (if not full reloads)
+    document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            if (!isMuted) {
+                // continue playing
+            } else {
+                // keep sound muted
+            }
+        });
+    });
+    // --- Mobile Menu Logic ---
+    (function () {
+        function closeMobileMenuOnOutsideClick() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            document.addEventListener('click', function(e) {
+                const menuButton = document.getElementById('mobile-menu-button');
+                if (!mobileMenu || !menuButton) return;
+                if (!mobileMenu.classList.contains('hidden')) {
+                    if (!mobileMenu.contains(e.target) && e.target !== menuButton) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        }
+        function initMobileMenu() {
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (menuButton && mobileMenu) {
+                menuButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    mobileMenu.classList.toggle('hidden');
+                });
+                // Accessibility: close menu on Escape
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+            closeMobileMenuOnOutsideClick();
+        }
+        if (document.readyState !== 'loading') {
+            initMobileMenu();
+        } else {
+            document.addEventListener('DOMContentLoaded', initMobileMenu);
+        }
+    })();
     </script>
 
     <!-- Mobile Menu Toggle Logic -->
@@ -106,24 +197,10 @@
             function initMobileMenu() {
                 const menuButton = document.getElementById('mobile-menu-button');
                 const mobileMenu = document.getElementById('mobile-menu');
-                const musicBtnMobile = document.getElementById('music-control-mobile');
-                const bgMusic = document.getElementById('bg-music');
 
                 if (menuButton && mobileMenu) {
                     menuButton.addEventListener('click', () => {
                         mobileMenu.classList.toggle('hidden');
-                    });
-                }
-
-                if (musicBtnMobile && bgMusic) {
-                    musicBtnMobile.addEventListener('click', () => {
-                        if (bgMusic.paused) {
-                            bgMusic.play();
-                            musicBtnMobile.textContent = 'Mute Music 🔇';
-                        } else {
-                            bgMusic.pause();
-                            musicBtnMobile.textContent = 'Play Music 🔊';
-                        }
                     });
                 }
             }
