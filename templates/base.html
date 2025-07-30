@@ -103,11 +103,17 @@
     // --- Sound Logic with accessibility and SVG icons ---
     let isMuted = false;
     document.addEventListener("DOMContentLoaded", () => {
+        const bgMusic = document.getElementById('bg-music');
         isMuted = false;
         updateMuteButton();
-        const bgMusic = document.getElementById('bg-music');
         if (bgMusic) {
-            bgMusic.play().catch(e => {});
+            const playPromise = bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Some browsers block autoplay until user interaction
+                    console.log("Autoplay blocked. Will play on user interaction.");
+                });
+            }
         }
     });
     function toggleMute() {
@@ -214,14 +220,23 @@
             const menuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             if (menuButton && mobileMenu) {
+                const icon = menuButton.querySelector('svg');
+                const hamburger = `<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>`;
+                const closeX = `<line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/>`;
                 menuButton.addEventListener('click', (e) => {
                     e.stopPropagation();
                     mobileMenu.classList.toggle('hidden');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        icon.innerHTML = closeX;
+                    } else {
+                        icon.innerHTML = hamburger;
+                    }
                 });
                 // Accessibility: close menu on Escape
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
                         mobileMenu.classList.add('hidden');
+                        icon.innerHTML = hamburger;
                     }
                 });
             }
