@@ -1,0 +1,922 @@
+/* --- Global Styles & Fonts --- */
+/* Smooth scrolling for the entire page */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Bangers', cursive;
+    background-color: #4A2C0B; /* Dark brown background */
+    color: #FFD700; /* Gold text color */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* --- New Hero Section Style --- */
+.hero-section {
+    /* Creates a "spotlight" effect for the background */
+    background: radial-gradient(circle at 50% 50%, #6a4a2a, #4A2C0B);
+}
+
+/* --- Keyframe Animations --- */
+/* Simple fade-in effect for page content */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Enhanced fade-up animation for hero elements */
+@keyframes fadeUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Staggered fade-up for multiple elements */
+@keyframes fadeUpDelay {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Bouncing effect for the main title */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Floating effect for images like the happy poop */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Animation for the raining poop emoji */
+@keyframes rain {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100vh);
+    }
+}
+
+/* Menu dropdown animations */
+@keyframes menuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes menuSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+}
+
+/* --- Menu Animation Classes --- */
+.menu-enter {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    animation: menuSlideIn 0.3s ease forwards;
+}
+
+.menu-enter-active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-exit {
+    animation: menuSlideOut 0.2s ease forwards;
+}
+
+/* --- Micro-interaction Classes --- */
+.hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Meme gallery hover effects */
+.meme-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+}
+
+.meme-hover:hover {
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+    z-index: 10;
+    position: relative;
+}
+
+/* Button micro-interactions */
+.btn-interactive {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0); /* Hardware acceleration */
+}
+
+.btn-interactive:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.btn-interactive:active {
+    transform: translateY(0) scale(0.98);
+    transition-duration: 0.1s;
+}
+
+/* Gradient button styling for meme-coin vibes */
+.btn-gradient {
+    background: linear-gradient(to right, #fbbf24, #f59e0b, #d97706);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(to right, #f59e0b, #d97706, #b45309);
+    box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.btn-gradient:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Animation Classes --- */
+.fade-in {
+    animation: fadeIn 1s ease-in;
+}
+
+.animate-fade-up {
+    animation: fadeUp 0.8s ease-out forwards;
+    opacity: 0; /* Start hidden */
+}
+
+.animate-fade-up-delay {
+    animation: fadeUpDelay 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+    opacity: 0; /* Start hidden */
+}
+
+.animate-fade-up-delay-2 {
+    animation: fadeUpDelay 0.8s ease-out forwards;
+    animation-delay: 0.6s;
+    opacity: 0; /* Start hidden */
+}
+
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+.float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* --- Raining Poop Effect --- */
+#rain-container {
+    position: fixed; /* Changed to fixed to cover entire page */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; /* Full viewport height to cover entire page */
+    pointer-events: none; /* Allows clicks to pass through */
+    z-index: 5; /* Places it above the background but below content */
+    overflow: hidden;
+}
+
+.poop {
+    position: absolute;
+    font-size: 2em;
+    animation: rain 5s linear infinite;
+    opacity: 0.7;
+    color: #8B4513; /* SaddleBrown for the poop color */
+}
+
+/* --- Background & Layout --- */
+/* This class is no longer used on the home page but kept for other pages */
+.cloud-bg {
+    background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDBweCIgdmlld0JveD0iMCAwIDEwMDAgMTAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxwYXRoIGQ9Ik0wIDUwQzAgMjIuMzg1IDIyLjM4NSAwIDUwIDBTMTAwIDIyLjM4NSAxMDAgNTBIMDBaIiBmaWxsPSIjNEExQzBCSI8L3BhdGg+ICA8cGF0aCBkPSJNMTAwIDUwQzEwMCAyMi4zODUgMTIyLjM4NSAwIDE1MCAwUzIwMCAyMi4zODUgMjAwIDUwSDEwMFoiIGZpbGw9IiM0QTFDMEIiPjwvcGF0aD4KPC9zdmc+') repeat-x bottom;
+    background-size: contain;
+}
+
+/* Parallax scrolling effect for the background */
+.parallax {
+    background-attachment: fixed;
+}
+
+/* --- Interactive Elements --- */
+/* Adds a slight scaling effect on hover for buttons and links */
+button:hover, a.hover\:scale-105:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s;
+}
+
+/* --- Custom Logo Style --- */
+/* This style turns the main poop logo into a circular medallion */
+.main-poop-logo {
+    border-radius: 50%; /* Makes the image container circular */
+    padding: 0.5rem; /* Adds space between the image and the border */
+    background-color: #8B4513; /* A brown that complements the theme */
+    border: 4px solid #FFD700; /* A thick, gold border */
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); /* Adds a yellow glow */
+}
+
+/* --- Icon Filter Trick --- */
+/* This class applies the brightness/invert filter to make any icon white */
+.icon-filter {
+    filter: brightness(0) invert(1);
+}
+
+/* --- Frosted Glass Effect --- */
+.frosted-glass {
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* For Safari */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+    transform-origin: top center;
+}
+
+/* Enhanced frosted glass for navbar */
+.navbar-frosted {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2); /* Gold border bottom */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Menu dropdown specific styling */
+.menu-dropdown {
+    transform-origin: top right;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-dropdown.hidden {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.menu-dropdown.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    visibility: visible;
+}
+
+/* --- Enhanced Tooltips --- */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 120px;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #FFD700;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    font-size: 12px;
+    font-weight: normal;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Extended Page Sections - Ensure they appear above falling sheets */
+#about-section,
+#community-section,
+#social-section {
+    position: relative;
+    z-index: 10; /* Higher than rain container (z-index: 5) */
+    background: rgba(0, 0, 0, 0.1); /* Subtle background to help text stand out */
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Use active states for better touch feedback */
+    #mobile-menu-trigger:active,
+    #desktop-menu-trigger:active,
+    #dark-mode-toggle:active,
+    #mute-button:active {
+        background-color: #d97706 !important; /* yellow-600 */
+        transform: scale(0.95);
+    }
+    
+    #mobile-menu-dropdown a:active,
+    #menu-dropdown a:active {
+        background-color: rgba(234, 179, 8, 0.7) !important; /* yellow-500/70 */
+    }
+}
+
+/* Ensure buttons are touch-friendly on all devices */
+button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    #mobile-menu-dropdown,
+    #menu-dropdown {
+        border: 2px solid #FFD700;
+    }
+    
+    #mobile-menu-dropdown a,
+    #menu-dropdown a {
+        border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    #mobile-menu-dropdown,
+    #menu-dropdown,
+    #mobile-menu-dropdown a,
+    #menu-dropdown a {
+        transition: none !important;
+    }
+}
+
+/* --- Meme Grid Enhancements --- */
+
+/* Hover zoom effect for meme images */
+.meme-image {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.meme-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+/* Animated vote count */
+.vote-count {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: inline-block;
+}
+
+.vote-count.animate {
+    animation: voteCountBounce 0.6s ease-out;
+}
+
+@keyframes voteCountBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); color: #10B981; }
+    100% { transform: scale(1); }
+}
+
+/* Lightbox Modal */
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.lightbox-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    background: linear-gradient(135deg, #2D1810, #4A2C0B);
+    border-radius: 16px;
+    border: 2px solid #FFD700;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.lightbox-overlay.active .lightbox-content {
+    transform: scale(1);
+}
+
+.lightbox-image {
+    max-width: 100%;
+    max-height: 60vh;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 15px;
+}
+
+.lightbox-info {
+    text-align: center;
+    color: #FFD700;
+}
+
+.lightbox-description {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #FDE68A;
+}
+
+.lightbox-votes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.lightbox-vote-count {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #FFD700;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.lightbox-close:hover {
+    color: #FCA5A5;
+    transform: scale(1.1);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced meme card hover effects */
+.meme-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.meme-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+}
+
+/* Vote button enhanced animations */
+.vote-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.vote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.vote-btn:active {
+    transform: translateY(0);
+}
+
+.vote-btn.voted {
+    background: linear-gradient(135deg, #10B981, #059669) !important;
+    color: white !important;
+    cursor: default;
+}
+
+/* Enhanced Voting UX Styles */
+.voted-glow {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6),
+                0 0 40px rgba(16, 185, 129, 0.4),
+                0 0 60px rgba(16, 185, 129, 0.2);
+    animation: votedPulse 2s ease-in-out infinite;
+}
+
+@keyframes votedPulse {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.6),
+                    0 0 40px rgba(16, 185, 129, 0.4),
+                    0 0 60px rgba(16, 185, 129, 0.2);
+        transform: scale(1.05);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.8),
+                    0 0 50px rgba(16, 185, 129, 0.6),
+                    0 0 70px rgba(16, 185, 129, 0.4);
+        transform: scale(1.08);
+    }
+}
+
+.vote-celebration {
+    animation: celebrationBounce 0.6s ease-in-out;
+}
+
+@keyframes celebrationBounce {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.2) rotate(-5deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+    75% { transform: scale(1.15) rotate(-2deg); }
+    100% { transform: scale(1.05) rotate(0deg); }
+}
+
+.floating-vote-text {
+    animation: floatUp 1s ease-out forwards;
+    font-family: 'Arial', sans-serif;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0px) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-15px) scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-30px) scale(1);
+        opacity: 0;
+    }
+}
+
+.live-update-pulse {
+    animation: liveUpdateGlow 1s ease-in-out;
+}
+
+@keyframes liveUpdateGlow {
+    0% { 
+        color: inherit;
+        text-shadow: none;
+    }
+    50% { 
+        color: #3B82F6;
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+        transform: scale(1.1);
+    }
+    100% { 
+        color: inherit;
+        text-shadow: none;
+        transform: scale(1);
+    }
+}
+
+/* Enhanced vote count animation */
+.vote-count.animate {
+    animation: voteCountBounce 0.6s ease-in-out, voteCountGlow 0.6s ease-in-out;
+}
+
+@keyframes voteCountGlow {
+    0% { 
+        color: inherit;
+        text-shadow: none;
+    }
+    50% { 
+        color: #10B981;
+        text-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+        transform: scale(1.2);
+    }
+    100% { 
+        color: inherit;
+        text-shadow: none;
+        transform: scale(1);
+    }
+}
+
+/* Enhanced Voting UX Styles */
+.skeleton-container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    height: 450px; /* Match typical meme card height */
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 8px 8px 0 0;
+}
+
+.skeleton-content {
+    padding: 1.5rem;
+}
+
+.skeleton-text {
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton-text.line-1 {
+    height: 20px;
+    width: 100%;
+    animation-delay: 0.1s;
+}
+
+.skeleton-text.line-2 {
+    height: 20px;
+    width: 80%;
+    animation-delay: 0.2s;
+}
+
+.skeleton-text.line-3 {
+    height: 20px;
+    width: 60%;
+    animation-delay: 0.3s;
+}
+
+.skeleton-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.skeleton-vote-count {
+    width: 60px;
+    height: 24px;
+    background: linear-gradient(90deg, 
+        rgba(139, 92, 246, 0.1) 25%, 
+        rgba(139, 92, 246, 0.2) 50%, 
+        rgba(139, 92, 246, 0.1) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 12px;
+    animation-delay: 0.4s;
+}
+
+.skeleton-button {
+    width: 100px;
+    height: 36px;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 18px;
+    animation-delay: 0.5s;
+}
+
+@keyframes skeletonShimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Image loading states */
+.meme-image-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.meme-image {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.meme-image.loaded {
+    opacity: 1;
+}
+
+.image-skeleton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 8px 8px 0 0;
+}
+
+.image-skeleton.hidden {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Loading states for lightbox */
+.lightbox-image-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.lightbox-image {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+}
+
+.lightbox-image.loaded {
+    opacity: 1;
+}
+
+.lightbox-skeleton {
+    position: absolute;
+    width: 80%;
+    height: 60%;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+.lightbox-skeleton.hidden {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Image fade-in animation */
+@keyframes imageFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Performance optimizations for skeleton animations */
+.skeleton-container,
+.skeleton-image,
+.skeleton-text,
+.skeleton-button,
+.skeleton-vote-count,
+.image-skeleton,
+.lightbox-skeleton {
+    will-change: transform, opacity;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-container,
+    .skeleton-image,
+    .skeleton-text,
+    .skeleton-button,
+    .skeleton-vote-count,
+    .image-skeleton,
+    .lightbox-skeleton {
+        animation: none;
+    }
+    
+    .meme-card {
+        transition: none;
+    }
+    
+    .meme-image {
+        transition: opacity 0.3s ease;
+    }
+}
+
+/* Mobile optimizations for lightbox */
+@media (max-width: 768px) {
+    .lightbox-content {
+        max-width: 95vw;
+        max-height: 95vh;
+        padding: 15px;
+    }
+    
+    .lightbox-image {
+        max-height: 50vh;
+    }
+    
+    .lightbox-votes {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .meme-image:hover {
+        transform: scale(1.02); /* Reduced hover effect on mobile */
+    }
+}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Launch - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">The Flush is Coming</h1>
+    
+    <!-- Toilet poop image with the main logo style applied -->
+    <img src="{{ url_for('static', filename='images/toilet_poop.png') }}" alt="Poop on a Toilet" class="h-32 mx-auto mt-8 main-poop-logo"
+         onerror="this.onerror=null;this.src='https://placehold.co/128x128/4A2C0B/FFD700?text=🚽';">
+    
+    <div class="max-w-3xl mx-auto mt-8 space-y-4 text-2xl md:text-3xl">
+    <p>{{ SITE_NAME }} is finally shitting in The Arena. Get ready for the mess!</p>
+        <p>Whitelist spots are filling up fast. Tag your community on X for a chance to get in.</p>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div id="countdown" class="mt-12">
+        <h2 class="text-4xl">Launching In:</h2>
+        <div id="timer" class="text-5xl md:text-7xl tracking-widest mt-4"></div>
+    </div>
+    
+    <!-- Call to action button -->
+    <a href="{{ url_for('web.whitelist') }}" class="mt-12 inline-block bg-yellow-500 text-black px-8 py-4 rounded-full text-2xl shadow-lg hover:scale-105">
+        Join Whitelist Now 🎟️
+    </a>
+</section>
+
+<div class="py-10 text-center text-lg text-yellow-200 opacity-75">
+    © 2025 {{ SITE_NAME }} on AVAX. All rights reserved... or flushed.
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set the date for the countdown.
+        // NOTE: You can change this to your desired launch date.
+        const countdownDate = new Date("Aug 1, 2025 18:00:00 UTC").getTime();
+
+        const timerElement = document.getElementById("timer");
+
+        if (timerElement) {
+            const timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = countdownDate - now;
+
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    timerElement.innerHTML = "LAUNCHED!";
+                    return;
+                }
+
+                // Time calculations for days, hours, minutes and seconds
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Format the output with leading zeros
+                const formattedDays = String(days).padStart(2, '0');
+                const formattedHours = String(hours).padStart(2, '0');
+                const formattedMinutes = String(minutes).padStart(2, '0');
+                const formattedSeconds = String(seconds).padStart(2, '0');
+
+                timerElement.innerHTML = `${formattedDays}d : ${formattedHours}h : ${formattedMinutes}m : ${formattedSeconds}s`;
+
+            }, 1000);
+        }
+    });
+</script>
+{% endblock %}

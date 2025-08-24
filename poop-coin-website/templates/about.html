@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">About {{ SITE_NAME }} 💩</h1>
+    
+    <!-- Angry poop image with the main logo style applied -->
+    <img src="{{ url_for('static', filename='images/angry_poop.png') }}" alt="Angry Poop" class="h-32 mx-auto mt-8 main-poop-logo"
+         onerror="this.onerror=null;this.src='https://placehold.co/128x128/4A2C0B/FFD700?text=😠';">
+    
+    <div class="max-w-3xl mx-auto mt-8 space-y-6 text-2xl md:text-3xl">
+    <p>{{ SITE_NAME }} is your favorite digital degen drop. It stinks. It pumps. Flush your FUD and embrace the dump.</p>
+        <p>With 2.24 billion pounds of poop generated daily by humans alone, it was time to put the realest shitcoin on-chain. This isn't just a meme; it's a movement. A bowel movement.</p>
+        <p>We're 100% community-flushed, with no team tokens and no pre-sale. Just pure, unadulterated POOP for the people.</p>
+    </div>
+    
+</section>
+
+<!-- A simple footer-like section specific to this page -->
+<div class="py-10 text-center text-lg text-yellow-200 opacity-75">
+    © 2025 {{ SITE_NAME }} on AVAX. All rights reserved... or flushed.
+</div>
+{% endblock %}

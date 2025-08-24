@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Whitelist - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">Join the Whitelist</h1>
+    <p class="text-2xl mt-4">Get early access to the {{ SITE_NAME }} launch. Connect your wallet to join.</p>
+
+    <div class="my-12 p-8 bg-black bg-opacity-30 rounded-lg max-w-lg mx-auto border border-yellow-500">
+        <h2 class="text-3xl mb-4">Submit Your Wallet</h2>
+        
+        <!-- The form submission is handled by JavaScript instead of a standard form action -->
+        <form id="whitelist-form">
+            <div class="mb-4">
+                <label for="wallet_address" class="block text-left mb-2 text-xl">Your AVAX Wallet Address:</label>
+                <input type="text" name="address" id="wallet_address" class="w-full text-black bg-gray-200 rounded p-3 text-lg" placeholder="Connect wallet to auto-fill" required>
+            </div>
+            
+            <!-- This button connects the wallet and auto-fills the input -->
+            <button type="button" id="connect-and-fill" class="bg-blue-500 text-white px-6 py-3 rounded-full text-xl btn-interactive w-full mb-4 shadow-md">
+                Connect & Auto-Fill Address
+            </button>
+
+            <!-- This button submits the form -->
+            <button type="submit" class="btn-gradient text-black px-6 py-3 rounded-full text-xl btn-interactive w-full shadow-md">
+                Submit to Whitelist 🎟️
+            </button>
+        </form>
+        
+        <!-- A dedicated area for showing API responses (success/error messages) -->
+    <div id="form-status" class="mt-4 text-lg h-8 transition-opacity duration-500" style="opacity:1;"></div>
+    </div>
+
+</section>
+
+<div class="py-10 text-center text-lg text-yellow-200 opacity-75">
+    © 2025 {{ SITE_NAME }} on AVAX. All rights reserved... or flushed.
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// The connectWallet function is available globally from main.js
+document.addEventListener('DOMContentLoaded', () => {
+    const whitelistForm = document.getElementById('whitelist-form');
+    const addressInput = document.getElementById('wallet_address');
+    const formStatus = document.getElementById('form-status');
+    const connectAndFillButton = document.getElementById('connect-and-fill');
+
+    // Handle the "Connect & Auto-Fill" button click
+    connectAndFillButton.addEventListener('click', async () => {
+        // The connectWallet function is defined in main.js and returns the user's address
+        const connectedAddress = await connectWallet();
+        if (connectedAddress) {
+            addressInput.value = connectedAddress;
+        }
+    });
+
+    // Handle the form submission
+    whitelistForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent the default browser form submission
+        formStatus.textContent = 'Submitting...';
+        formStatus.className = 'mt-4 text-lg h-8 text-yellow-300';
+
+        const address = addressInput.value;
+
+        // Basic validation
+        if (!address || !address.startsWith('0x') || address.length !== 42) {
+            formStatus.textContent = 'Error: Please provide a valid AVAX address.';
+            formStatus.className = 'mt-4 text-lg h-8 text-red-400';
+            return;
+        }
+
+        try {
+            // Send the address to the backend API
+            const response = await fetch('/api/whitelist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ address: address }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Display success message
+                formStatus.textContent = data.message;
+                formStatus.className = 'mt-4 text-lg h-8 text-green-400 transition-opacity duration-500';
+                formStatus.style.opacity = 1;
+                // Hide the message after 2 seconds with fade-out
+                setTimeout(() => {
+                    formStatus.style.opacity = 0;
+                    setTimeout(() => {
+                        formStatus.textContent = '';
+                        formStatus.className = 'mt-4 text-lg h-8 transition-opacity duration-500';
+                        formStatus.style.opacity = 1;
+                    }, 500);
+                }, 2000);
+            } else {
+                // Display error message from the server
+                formStatus.textContent = `Error: ${data.error || 'An unknown error occurred.'}`;
+                formStatus.className = 'mt-4 text-lg h-8 text-red-400';
+                formStatus.style.opacity = 1;
+            }
+        } catch (error) {
+            console.error('Error submitting to whitelist:', error);
+            formStatus.textContent = 'An unexpected error occurred. Please try again.';
+            formStatus.className = 'mt-4 text-lg h-8 text-red-400';
+        }
+    });
+});
+</script>
+{% endblock %}

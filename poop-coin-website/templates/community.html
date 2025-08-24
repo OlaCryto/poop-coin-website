@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Community - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">Join the Bowel Movement</h1>
+    
+    <div class="max-w-3xl mx-auto mt-8 space-y-6 text-2xl md:text-3xl">
+        <p>The toilet’s warm. The blockchain is ready. The community is buzzing. Let the dump begin.</p>
+        <p>Follow us on our social channels to stay up to date with the latest news, announcements, and meme contests.</p>
+    </div>
+
+    <!-- Social Media Links -->
+    <div class="mt-12 flex flex-col items-center space-y-4">
+        <a href="https://x.com/Poop_On_Avax" target="_blank" class="btn-gradient text-black px-8 py-4 rounded-full text-2xl shadow-lg btn-interactive w-full max-w-md text-center">
+            Follow on X (Twitter)
+        </a>
+        <!-- Add more links here as needed, e.g., for Telegram or Discord -->
+        <!-- 
+        <a href="#" target="_blank" class="btn-gradient text-black px-8 py-4 rounded-full text-2xl shadow-lg btn-interactive w-full max-w-md text-center">
+            Join our Telegram
+        </a>
+        -->
+    </div>
+
+    <!-- Call to action for the meme gallery -->
+    <div class="mt-16">
+        <h2 class="text-4xl">Got Memes?</h2>
+        <p class="text-2xl mt-4">Share your best work in the gallery and vote for your favorites!</p>
+    <a href="{{ url_for('web.memes') }}" class="mt-6 inline-block btn-gradient text-black border-2 border-yellow-500 px-8 py-3 rounded-full text-xl shadow-lg btn-interactive">
+            Go to Meme Gallery 🖼️
+        </a>
+    </div>
+</section>
+
+<div class="py-10 text-center text-lg text-yellow-200 opacity-75">
+    © 2025 {{ SITE_NAME }} on AVAX. All rights reserved... or flushed.
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- This is the most important tag for responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="{{ SITE_TAGLINE }}">
+    <meta name="keywords" content="{{ SITE_NAME }}, AVAX, meme coin, shitcoin, blockchain">
+    <title>{% block title %}{{ SITE_NAME }} on AVAX{% endblock %}</title>
+    
+    <!-- Reverted back to the original square image favicon -->
+    <link rel="icon" href="{{ LOGO_PATH }}">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+        <style>
+            body { font-family: 'Bangers', cursive; }
+        </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" defer></script>
+    {% block head %}{% endblock %}
+</head>
+<body class="relative" id="body-root">
+
+    <audio id="bg-music" loop src="https://www.soundjay.com/toilet-flush-4.mp3" preload="none"></audio>
+    <audio id="click-sound" src="{{ url_for('static', filename='sounds/fart.mp3') }}" preload="auto"></audio>
+    
+    <!-- Navigation bar before hamburger menu -->
+    <nav class="bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-90 text-white p-4 sticky top-0 z-20">
+        <div class="container mx-auto flex flex-wrap items-center justify-between">
+            <!-- Logo -->
+            <h1 class="mb-2 sm:mb-0">
+            <a href="{{ url_for('web.home') }}" class="text-3xl font-bold plays-sound text-white dark:text-gray-100">💩 {{ SITE_NAME }}</a>
+            </h1>
+            <!-- Navigation links and controls -->
+            <div class="flex items-center gap-2 relative">
+                <!-- Mobile Menu (click-based version of desktop menu) -->
+                <div class="relative md:hidden">
+                  <div id="mobile-menu-trigger" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold cursor-pointer touch-manipulation" tabindex="0" aria-label="Open Menu" title="Menu">Menu</div>
+                  <div id="mobile-menu-dropdown" class="absolute top-full right-0 w-56 rounded-xl shadow-lg overflow-hidden z-50 frosted-glass dark:bg-gray-800 opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out flex flex-col">
+                    <a href="{{ url_for('web.about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">About</a>
+                    <a href="{{ url_for('web.tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Tokenomics</a>
+                    <a href="{{ url_for('web.how_to_buy') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">How to Buy</a>
+                    <a href="{{ url_for('web.community') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Community</a>
+                    <a href="{{ url_for('web.whitelist') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Whitelist</a>
+                    <a href="{{ url_for('web.memes') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Meme Gallery</a>
+                    <a href="{{ url_for('holders.holders') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Ticket Holders</a>
+                    <a href="{{ url_for('web.history') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">History</a>
+                    <a href="{{ url_for('web.leaderboard') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Leaderboard</a>
+                    
+                    <!-- Mobile Controls Section -->
+                    <div class="border-t border-yellow-500/30 mt-2 pt-2 px-3 pb-3">
+                      <div class="flex justify-center gap-2">
+                        <button id="mobile-dark-mode-toggle" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 active:bg-yellow-700 transition text-sm touch-manipulation plays-sound" aria-label="Toggle Dark Mode" title="Toggle Dark Mode" type="button">🌙</button>
+                        <button id="mobile-mute-button" class="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 active:bg-yellow-700 transition text-sm unmuted touch-manipulation plays-sound" aria-label="Mute/Unmute" title="Mute" tabindex="0" type="button">
+                          <span id="mobile-mute-icon">
+                            <!-- Unmuted SVG -->
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Desktop menu -->
+                <div class="relative group hidden md:block">
+                  <div id="desktop-menu-trigger" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold cursor-pointer group-hover:bg-yellow-600" tabindex="0" aria-label="Open Menu" title="Menu">Menu</div>
+                  <div id="menu-dropdown" class="absolute top-full right-0 w-56 rounded-xl shadow-lg overflow-hidden z-50 frosted-glass dark:bg-gray-800 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 ease-in-out flex flex-col">
+                    <a href="{{ url_for('web.about') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">About</a>
+                    <a href="{{ url_for('web.tokenomics') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Tokenomics</a>
+                    <a href="{{ url_for('web.how_to_buy') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">How to Buy</a>
+                    <a href="{{ url_for('web.community') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Community</a>
+                    <a href="{{ url_for('web.whitelist') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Whitelist</a>
+                    <a href="{{ url_for('web.memes') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Meme Gallery</a>
+                    <a href="{{ url_for('holders.holders') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Ticket Holders</a>
+                    <a href="{{ url_for('web.history') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">History</a>
+                    <a href="{{ url_for('web.leaderboard') }}" class="px-5 py-3 text-lg font-bold text-yellow-300 dark:text-yellow-400 hover:bg-yellow-500/50 hover:text-black dark:hover:bg-yellow-400/50 dark:hover:text-gray-900 transition-colors duration-300 plays-sound">Leaderboard</a>
+                  </div>
+                </div>
+                <!-- Desktop controls (visible only on larger screens) -->
+                <button id="dark-mode-toggle" class="hidden md:block px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 active:bg-yellow-700 transition text-xs sm:text-base touch-manipulation plays-sound" aria-label="Toggle Dark Mode" title="Toggle Dark Mode" type="button">🌙</button>
+                <button id="mute-button" class="hidden md:block px-3 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-600 active:bg-yellow-700 transition text-xs sm:text-base unmuted touch-manipulation plays-sound" aria-label="Mute/Unmute" title="Mute" tabindex="0" type="button">
+                  <span id="mute-icon">
+                    <!-- Unmuted SVG -->
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                  </span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="fade-in">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" class="fixed bottom-8 right-8 w-12 h-12 bg-yellow-500 hover:bg-yellow-600 text-black rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-40 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
+
+    <!-- External JavaScript Files to avoid CSP issues -->
+    <script src="{{ url_for('static', filename='js/tailwind-config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/site-config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dark-mode-original.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sound-manager-original.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/menu-manager.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="w-full max-w-3xl mx-auto mt-10 mb-4 p-4 bg-gradient-to-br from-yellow-900 via-gray-900 to-yellow-700 rounded-2xl border-4 border-yellow-400 shadow-2xl">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-3xl font-extrabold text-yellow-300 tracking-wide flex items-center gap-2">
+            <span>🌐</span> {{ SITE_NAME }} Live Alerts
+        </h2>
+        <span class="text-sm text-gray-300 font-mono animate-pulse">LIVE</span>
+    </div>
+    <div class="flex justify-end mb-4">
+        <button id="notify-toggle" class="px-4 py-2 rounded-full bg-yellow-500 text-black font-bold shadow hover:bg-yellow-400 transition">
+            🔔 Enable Notifications
+        </button>
+        <span id="notify-status" class="ml-4 text-sm text-gray-300"></span>
+    </div>
+    <ul id="bot-alert-list" class="space-y-6 max-h-[32rem] overflow-y-auto"></ul>
+</div>
+<script>
+// Register service worker for push notifications
+let vapidPublicKey = null;
+fetch('/vapid_public_key')
+    .then(res => res.json())
+    .then(data => {
+        vapidPublicKey = data.key;
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/js/sw-poop-alerts.js').then(function(reg) {
+                console.log('Service Worker registered for {{ SITE_NAME }} alerts!', reg);
+            }).catch(function(err) {
+                console.error('Service Worker registration failed:', err);
+            });
+        }
+    });
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+function subscribeUserToPush() {
+    if (!('serviceWorker' in navigator) || !vapidPublicKey) return;
+    navigator.serviceWorker.ready.then(function(reg) {
+        if (!('PushManager' in window)) {
+            notifyStatus.textContent = 'Push notifications not supported.';
+            return;
+        }
+        reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+        }).then(function(sub) {
+            notifyStatus.textContent = 'Push subscription successful!';
+            // Send subscription to backend
+            fetch('/register_push', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(sub)
+            }).then(res => res.json()).then(data => {
+                console.log('Push subscription registered:', data);
+            });
+        }).catch(function(err) {
+            notifyStatus.textContent = 'Push subscription failed.';
+            console.error('Push subscription error:', err);
+        });
+    });
+}
+// Notification toggle logic
+const notifyToggle = document.getElementById('notify-toggle');
+const notifyStatus = document.getElementById('notify-status');
+if (notifyToggle) {
+    notifyToggle.addEventListener('click', () => {
+        if (!('Notification' in window)) {
+            notifyStatus.textContent = 'Notifications not supported on this device.';
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            notifyStatus.textContent = 'Notifications already enabled.';
+            subscribeUserToPush();
+        } else if (Notification.permission === 'denied') {
+            notifyStatus.textContent = 'Notifications are blocked. Please enable in browser settings.';
+        } else {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    notifyStatus.textContent = 'Notifications enabled! You will receive alerts.';
+                    subscribeUserToPush();
+                } else {
+                    notifyStatus.textContent = 'Notifications not enabled.';
+                }
+            });
+        }
+    });
+}
+let lastAlertIds = [];
+function renderPoopAlerts(alerts) {
+    const list = document.getElementById('bot-alert-list');
+    list.innerHTML = '';
+    if (!alerts || alerts.length === 0) {
+        list.innerHTML = '<li class="text-gray-400 text-center py-8 text-xl font-bold">No alerts yet.</li>';
+        lastAlertIds = [];
+        return;
+    }
+    // Track new alerts for notification
+    const newIds = alerts.map(a => a.contract || a.timestamp || Math.random());
+    alerts.forEach((alert, idx) => {
+        const li = document.createElement('li');
+        li.className = 'flex flex-col md:flex-row items-start md:items-center gap-4 bg-gray-800 bg-opacity-95 rounded-xl px-6 py-5 border-l-8 shadow-lg animate-fade-in ' +
+            (alert.tier === 'green' ? 'border-green-500' : alert.tier === 'blue' ? 'border-blue-500' : alert.tier === 'champs' ? 'border-yellow-400' : 'border-red-500');
+
+        // Avatar/Icon
+        let avatar = alert.profile_linked && alert.twitter ? `<img src="https://arena.social/api/avatar/${alert.twitter}" alt="avatar" class="h-16 w-16 rounded-full border-4 border-yellow-400 shadow-lg">` : `<img src="/static/images/arena_logo.png" alt="arena" class="h-16 w-16 rounded-full border-4 border-gray-700">`;
+
+        // Main Info
+        let main = `<div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="font-bold text-lg text-yellow-300">${alert.header || ''}</span>
+                <span class="text-xs px-2 py-1 rounded bg-yellow-700 text-black font-bold">${alert.tier ? alert.tier.toUpperCase() : ''}</span>
+            </div>
+            <div class="text-2xl font-extrabold text-white mb-1">${alert.name || ''} <span class="text-yellow-400">${alert.symbol || ''}</span></div>
+            <div class="flex flex-wrap gap-4 text-sm text-gray-300 mb-2">
+                ${alert.contract ? `<span><b>Contract:</b> <span class="font-mono">${alert.contract}</span></span>` : ''}
+                ${alert.creator ? `<span><b>Creator:</b> ${alert.creator}</span>` : ''}
+                ${alert.tokens_created !== undefined ? `<span><b>History:</b> ${alert.tokens_created} launches</span>` : ''}
+                ${alert.bonding !== undefined && alert.liquidity !== undefined ? `<span><b>Bonding/Liquidity:</b> ${alert.bonding} / ${alert.liquidity}</span>` : ''}
+                ${alert.avax_used !== undefined ? `<span><b>AVAX Used:</b> ${alert.avax_used}</span>` : ''}
+                ${alert.market_cap !== undefined ? `<span><b>Market Cap:</b> ${alert.market_cap}</span>` : ''}
+                ${alert.deployer_balance !== undefined ? `<span><b>Deployer Balance:</b> ${alert.deployer_balance} AVAX</span>` : ''}
+            </div>
+            ${alert.profile_linked ? `<div class="flex flex-wrap gap-4 text-sm text-gray-200 mb-2">
+                ${alert.twitter ? `<span><b>Deployer:</b> @${alert.twitter}</span>` : ''}
+                <span><b>Arena Followers:</b> ${alert.followers_arena || 0}</span>
+                <span><b>Twitter Followers:</b> ${alert.followers_twitter || 0}</span>
+                <span><b>Arena Volume:</b> ${alert.arena_volume || 0} AVAX</span>
+                <span><b>Ticket Price:</b> ${alert.ticket_price_avax || 0} AVAX</span>
+                <span><b>Buy/Sell:</b> 🟢 ${alert.arena_buys || 0} / 🔴 ${alert.arena_sells || 0}</span>
+                <span><b>Badges:</b> ${alert.badges && alert.badges.length ? alert.badges.join(', ') : '❌ None'}</span>
+            </div>` : ''}
+            ${alert.reasons && alert.reasons.length ? `<div class="mt-2 text-red-400 font-bold">⚠ Risk Factors: ${alert.reasons.join(', ')}</div>` : ''}
+            ${alert.watchlisted ? `<div class="mt-2 text-red-500 font-bold">🛑 Watchlist Alert: Creator flagged!</div>` : ''}
+            <div class="mt-2 text-xs text-gray-400">🕒 ${alert.timestamp ? new Date(alert.timestamp).toLocaleString() : ''} UTC</div>
+            <div class="mt-3 flex flex-wrap gap-2">
+                ${alert.arena_link ? `<a href='${alert.arena_link}' target='_blank' class='inline-block bg-yellow-500 text-black px-3 py-1 rounded font-bold shadow hover:bg-yellow-400 transition'>🌐 Arena</a>` : ''}
+                ${alert.arenapro_link ? `<a href='${alert.arenapro_link}' target='_blank' class='inline-block bg-blue-500 text-white px-3 py-1 rounded font-bold shadow hover:bg-blue-400 transition'>📊 ArenaPro</a>` : ''}
+                ${alert.twitter && alert.profile_linked ? `<a href='https://x.com/${alert.twitter}' target='_blank' class='inline-block bg-black text-white px-3 py-1 rounded font-bold shadow hover:bg-gray-800 transition'>🐦 Twitter (X)</a>` : ''}
+                ${alert.twitter && alert.profile_linked ? `<a href='https://arena.social/${alert.twitter}' target='_blank' class='inline-block bg-gray-700 text-yellow-400 px-3 py-1 rounded font-bold shadow hover:bg-gray-900 transition'>👤 Arena Profile</a>` : ''}
+            </div>
+        </div>`;
+
+        li.innerHTML = `<div class="flex items-center gap-6">${avatar}${main}</div>`;
+        list.appendChild(li);
+
+        // Send browser notification for new alerts if enabled
+        if ('Notification' in window && Notification.permission === 'granted' && (!lastAlertIds.includes(newIds[idx]))) {
+            const notifTitle = `${alert.header || '{{ SITE_NAME }} Alert'}: ${alert.name || ''} (${alert.symbol || ''})`;
+            const notifBody = `${alert.tier ? alert.tier.toUpperCase() + ' | ' : ''}${alert.market_cap ? 'MC: ' + alert.market_cap + ' | ' : ''}${alert.contract ? 'CA: ' + alert.contract : ''}`;
+            const notifIcon = alert.profile_linked && alert.twitter ? `https://arena.social/api/avatar/${alert.twitter}` : '/static/images/arena_logo.png';
+            new Notification(notifTitle, {
+                body: notifBody,
+                icon: notifIcon
+            });
+        }
+    });
+    lastAlertIds = newIds;
+}
+// Fade-in animation for new alerts
+const style = document.createElement('style');
+style.innerHTML = `.animate-fade-in { animation: fadeIn 0.7s; } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: none;} }`;
+document.head.appendChild(style);
+function pollPoopAlerts() {
+    fetch('/api/alerts')
+        .then(res => res.json())
+        .then(data => {
+            renderPoopAlerts(data.alerts);
+        })
+        .catch(() => {
+            renderPoopAlerts([]);
+        });
+}
+setInterval(pollPoopAlerts, 3000);
+window.addEventListener('DOMContentLoaded', pollPoopAlerts);
+</script>
+{% endblock %}

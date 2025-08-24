@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Meme Gallery - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">The {{ SITE_NAME }} Meme Gallery</h1>
+    <p class="text-2xl mt-4">The community's finest, freshest dumps. Vote for your favorite!</p>
+
+    <!-- Enhanced Meme Upload Form with Drag & Drop -->
+    <div class="my-10 p-6 bg-black bg-opacity-30 dark:bg-gray-800/30 rounded-lg max-w-lg mx-auto border border-yellow-500 dark:border-yellow-400">
+        <h2 class="text-3xl mb-4 text-white dark:text-gray-100">Upload Your Masterpiece!</h2>
+        
+        <!-- The form submits to the 'memes' endpoint as a multipart form for file upload -->
+        <form action="{{ url_for('web.memes') }}" method="post" enctype="multipart/form-data" id="meme-upload-form">
+            
+            <!-- Drag & Drop Zone -->
+            <div id="drop-zone" class="mb-4 p-8 border-2 border-dashed border-yellow-500 dark:border-yellow-400 rounded-lg text-center transition-all duration-300 hover:border-yellow-400 hover:bg-yellow-500/10 cursor-pointer select-none" style="user-select: none;">
+                <div id="drop-content">
+                    <div class="text-4xl mb-2">📁</div>
+                    <p class="text-lg text-white dark:text-gray-100 mb-2">Drag & drop your meme here</p>
+                    <p class="text-sm text-gray-300 dark:text-gray-400 mb-4">or click to browse files</p>
+                    <div class="text-xs text-gray-400 dark:text-gray-500">Supports: PNG, JPG, GIF (max 10MB)</div>
+                </div>
+                
+                <!-- Hidden file input - properly hidden without pointer-events blocking -->
+                <input type="file" name="file" id="meme_file" 
+                       class="absolute opacity-0" 
+                       style="position: absolute; left: -9999px; width: 1px; height: 1px;"
+                       accept="image/png,image/jpeg,image/gif" required>
+            </div>
+            
+            <!-- Preview Container -->
+            <div id="preview-container" class="mb-4 hidden">
+                <div class="text-center">
+                    <p class="text-lg text-white dark:text-gray-100 mb-2">Preview:</p>
+                    <div class="relative inline-block">
+                        <img id="preview-image" class="max-w-full max-h-48 rounded-lg border border-yellow-500 dark:border-yellow-400" alt="Meme preview">
+                        <button type="button" id="remove-preview" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 transition-colors">✕</button>
+                    </div>
+                    <p id="file-info" class="text-sm text-gray-300 dark:text-gray-400 mt-2"></p>
+                </div>
+            </div>
+            
+            <!-- Description Input -->
+            <div class="mb-4">
+                <label for="meme_desc" class="block text-left mb-2 text-xl text-white dark:text-gray-100">Meme Description (for accessibility):</label>
+                <input type="text" name="description" id="meme_desc" maxlength="256" 
+                       class="w-full text-black dark:text-gray-900 bg-gray-200 dark:bg-gray-100 rounded p-2 border-2 border-transparent focus:border-yellow-500 dark:focus:border-yellow-400 transition-colors" 
+                       placeholder="Describe your meme (optional)">
+            </div>
+            
+            <!-- Submit Button with Loading State -->
+            <div class="text-center">
+                <button type="submit" id="submit-btn" class="btn-gradient text-black px-6 py-3 rounded-full text-xl btn-interactive plays-sound shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <span id="submit-text">🚀 Share Meme</span>
+                    <span id="loading-spinner" class="hidden">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-black inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Uploading...
+                    </span>
+                </button>
+            </div>
+        </form>
+        
+        <!-- Status Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mt-4">
+                {% for category, message in messages %}
+                    <p class="text-lg p-2 rounded {{ 'bg-green-500 text-black' if category == 'success' else 'bg-red-500 text-white' }}">{{ message }}</p>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Meme Grid -->
+    <!-- The grid displays memes sorted by votes in descending order -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-12" id="meme-grid">
+        {% for meme in memes %}
+        <div class="meme-card bg-black bg-opacity-50 p-4 rounded-lg flex flex-col items-center justify-between border border-yellow-700 hover-lift">
+            <!-- Meme image with enhanced hover effects -->
+            <img src="{{ url_for('static', filename='memes/' ~ meme.filename|e) }}"
+                 alt="{{ meme.description if meme.description else 'A ' ~ SITE_NAME ~ ' meme' }}"
+                 class="meme-image w-full h-auto rounded-md mb-4 object-cover cursor-pointer"
+                 data-meme-id="{{ meme.id }}"
+                 data-meme-filename="{{ meme.filename }}"
+                 data-meme-description="{{ meme.description if meme.description else 'A ' ~ SITE_NAME ~ ' meme' }}"
+                 data-meme-votes="{{ meme.votes }}">
+            
+            <div class="flex items-center space-x-4">
+                <!-- The data-id attribute holds the meme's unique ID for the voting API call -->
+                {% set is_voted = meme.id|string in session.get('voted_memes', []) %}
+                <button class="vote-btn {{ 'voted voted-glow' if is_voted else 'btn-gradient' }} text-black px-4 py-2 rounded-full btn-interactive shadow-md" 
+                        data-id="{{ meme.id }}" 
+                        aria-label="Vote for this meme"
+                        {% if is_voted %}disabled{% endif %}>
+                    {{ '✅ Voted!' if is_voted else 'Vote 👍' }}
+                </button>
+                <span id="votes-{{ meme.id }}" class="vote-count text-2xl font-bold">{{ meme.votes }}</span>
+            </div>
+            {% if meme.description %}
+            <div class="mt-2 text-yellow-200 text-base break-words">{{ meme.description }}</div>
+            {% endif %}
+        </div>
+        {% else %}
+        <!-- This message is shown if no memes have been uploaded yet -->
+        <p class="text-xl col-span-full">The gallery is empty. Be the first to upload a meme!</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination controls -->
+    {% if pages > 1 %}
+    <div class="flex justify-center mt-8 space-x-2">
+        {% for p in range(1, pages+1) %}
+            <a href="{{ url_for('web.memes', page=p) }}"
+               class="px-4 py-2 rounded-full border border-yellow-500 text-lg font-bold btn-interactive shadow-md {{ 'btn-gradient text-black' if p == page else 'bg-black text-yellow-300 hover:btn-gradient hover:text-black' }} transition"
+               aria-label="Go to page {{ p }}">{{ p }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
+        <div class="lightbox-content">
+            <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+            <div class="lightbox-image-container">
+                <img id="lightbox-image" class="lightbox-image" src="" alt="">
+            </div>
+            <div class="lightbox-info">
+                <div id="lightbox-description" class="lightbox-description"></div>
+                <div class="lightbox-votes">
+                    <button id="lightbox-vote-btn" class="vote-btn btn-gradient text-black px-6 py-3 rounded-full btn-interactive shadow-md">
+                        Vote 👍
+                    </button>
+                    <span id="lightbox-vote-count" class="lightbox-vote-count">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/memes-upload-new.js') }}"></script>
+{% endblock %}

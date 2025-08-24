@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Live Ticket Chart{% endblock %}
+{% block content %}
+<section class="py-10 container mx-auto">
+    <h1 class="text-4xl mb-6">Live Ticket Count Chart</h1>
+    <canvas id="ticketChart" width="600" height="300"></canvas>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let chart;
+let dataPoints = [];
+function fetchChartData() {
+    fetch('/api/holders_count')
+        .then(res => res.json())
+        .then(data => {
+            const now = new Date();
+            dataPoints.push({ x: now, y: data.count });
+            if (dataPoints.length > 50) dataPoints.shift();
+            if (chart) {
+                chart.data.labels = dataPoints.map(p => p.x.toLocaleTimeString());
+                chart.data.datasets[0].data = dataPoints.map(p => p.y);
+                chart.update();
+            }
+        });
+}
+function initChart() {
+    const ctx = document.getElementById('ticketChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Ticket Holders',
+                data: [],
+                borderColor: '#FFD700',
+                backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                tension: 0.3,
+                pointRadius: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { display: true, title: { display: true, text: 'Time' } },
+                y: { display: true, title: { display: true, text: 'Count' }, beginAtZero: true }
+            }
+        }
+    });
+}
+document.addEventListener('DOMContentLoaded', () => {
+    initChart();
+    setInterval(fetchChartData, 2000);
+});
+</script>
+{% endblock %}

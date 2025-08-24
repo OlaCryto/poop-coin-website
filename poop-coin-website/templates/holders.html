@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket Holders{% endblock %}
+
+{% block content %}
+<section class="py-10 container mx-auto">
+    <h1 class="text-4xl mb-6">Ticket Holders</h1>
+    <ul id="holders-list" class="space-y-4">
+        {% for holder in holders %}
+            <li class="p-4 bg-yellow-100 rounded shadow flex items-center gap-4">
+                <img src="{{ holder['traderUser']['twitterPicture'] }}" alt="{{ holder['traderUser']['twitterName'] }}" class="h-16 w-16 rounded-full border-2 border-yellow-500">
+                <div>
+                    <strong class="text-xl">{{ holder['traderUser']['twitterName'] }}</strong>
+                    <div class="text-gray-700">@{{ holder['traderUser']['twitterHandle'] }}</div>
+                    <div class="text-black mt-1">Tickets: <span class="font-bold">{{ holder['amount'] }}</span></div>
+                </div>
+            </li>
+        {% else %}
+            <li>No holders found.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+{% block scripts %}
+<script>
+function renderHolders(holders) {
+    const list = document.getElementById('holders-list');
+    if (!holders.length) {
+        list.innerHTML = '<li>No holders found.</li>';
+        return;
+    }
+    list.innerHTML = holders.map(holder => `
+        <li class="p-4 bg-yellow-100 rounded shadow flex items-center gap-4">
+            <img src="${holder.traderUser.twitterPicture}" alt="${holder.traderUser.twitterName}" class="h-16 w-16 rounded-full border-2 border-yellow-500">
+            <div>
+                <strong class="text-xl">${holder.traderUser.twitterName}</strong>
+                <div class="text-gray-700">@${holder.traderUser.twitterHandle}</div>
+                <div class="text-black mt-1">Tickets: <span class="font-bold">${holder.amount}</span></div>
+            </div>
+        </li>
+    `).join('');
+}
+
+function fetchHolders() {
+    fetch('/api/holders')
+        .then(res => res.json())
+        .then(data => {
+            renderHolders(data.holders || []);
+        });
+}
+
+setInterval(fetchHolders, 1000); // Poll every 1 second
+document.addEventListener('DOMContentLoaded', fetchHolders);
+</script>
+{% endblock %}
+{% endblock %}

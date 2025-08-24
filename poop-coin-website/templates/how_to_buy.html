@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}How to Buy - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="py-20 text-center container mx-auto px-4">
+    <h1 class="text-5xl md:text-6xl text-[#FFD700]">How to Buy {{ SITE_NAME }}</h1>
+    
+    <div class="max-w-3xl mx-auto mt-12 text-left">
+        <ol class="space-y-8 text-2xl md:text-3xl">
+            <!-- Step 1 -->
+            <li class="flex items-start gap-4">
+                <div class="bg-yellow-500 text-black rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center text-2xl">1</div>
+                <div>
+                    <h2 class="font-bold">Get a Wallet</h2>
+                    <p class="text-xl md:text-2xl">Download a wallet compatible with the Avalanche C-Chain, like <a href="https://metamask.io/" target="_blank" class="underline hover:text-yellow-300">MetaMask</a> or <a href="https://www.core.app/" target="_blank" class="underline hover:text-yellow-300">Core</a>.</p>
+                </div>
+            </li>
+            
+            <!-- Step 2 -->
+            <li class="flex items-start gap-4">
+                <div class="bg-yellow-500 text-black rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center text-2xl">2</div>
+                <div>
+                    <h2 class="font-bold">Get Some AVAX</h2>
+                    <p class="text-xl md:text-2xl">Buy AVAX from a major exchange (like Coinbase, Binance, etc.) and send it to your wallet's Avalanche C-Chain address.</p>
+                </div>
+            </li>
+
+            <!-- Step 3 -->
+            <li class="flex items-start gap-4">
+                <div class="bg-yellow-500 text-black rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center text-2xl">3</div>
+                <div>
+                    <h2 class="font-bold">Go to a DEX</h2>
+                    <p class="text-xl md:text-2xl">Visit a decentralized exchange (DEX) like <a href="#" class="underline hover:text-yellow-300">The Arena</a> or another platform where {{ SITE_NAME }} is listed.</p>
+                </div>
+            </li>
+
+            <!-- Step 4 -->
+            <li class="flex items-start gap-4">
+                <div class="bg-yellow-500 text-black rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center text-2xl">4</div>
+                <div>
+                    <h2 class="font-bold">Swap for {{ SITE_NAME }}</h2>
+                    <p class="text-xl md:text-2xl">Connect your wallet, paste the {{ SITE_NAME }} contract address (coming soon!), and swap your AVAX for {{ SITE_NAME }}. Flush your portfolio with the good stuff!</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<div class="py-10 text-center text-lg text-yellow-200 opacity-75">
+    © 2025 {{ SITE_NAME }} on AVAX. All rights reserved... or flushed.
+</div>
+{% endblock %}
